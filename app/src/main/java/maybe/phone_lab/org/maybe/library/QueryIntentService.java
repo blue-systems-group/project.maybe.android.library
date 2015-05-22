@@ -1,10 +1,10 @@
-package maybe.phone_lab.org.maybelibrary;
+package maybe.phone_lab.org.maybe.library;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
 
-import maybe.phone_lab.org.maybelibrary.utils.Utils;
+import maybe.phone_lab.org.maybe.library.utils.Utils;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in

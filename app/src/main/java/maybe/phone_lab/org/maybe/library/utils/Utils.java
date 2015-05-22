@@ -1,4 +1,4 @@
-package maybe.phone_lab.org.maybelibrary.utils;
+package maybe.phone_lab.org.maybe.library.utils;
 
 import android.util.Log;
 

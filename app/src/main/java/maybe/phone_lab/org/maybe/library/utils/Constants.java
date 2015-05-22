@@ -1,11 +1,11 @@
-package maybe.phone_lab.org.maybelibrary.utils;
+package maybe.phone_lab.org.maybe.library.utils;
 
 /**
  * Created by xcv58 on 5/21/15.
  */
 public class Constants {
     public static final long PULL_INTERVAL = 1000L * 60L;
-    public static final String PULL_INTENT = "maybe.phone_lab.org.maybe_library.pull_intent";
+    public static final String PULL_INTENT = "maybe.phone_lab.org.maybe.library.pull_intent";
 
     public static final String TAG = "Maybe_Library";
 

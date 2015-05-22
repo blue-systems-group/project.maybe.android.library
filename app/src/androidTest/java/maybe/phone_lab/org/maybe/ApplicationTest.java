@@ -1,4 +1,4 @@
-package maybe.phone_lab.org.maybelibrary;
+package maybe.phone_lab.org.maybe;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
