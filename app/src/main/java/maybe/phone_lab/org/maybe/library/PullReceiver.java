@@ -1,4 +1,4 @@
-package maybe.phone_lab.org.maybe.library.receivers;
+package maybe.phone_lab.org.maybe.library;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -10,6 +10,7 @@ import maybe.phone_lab.org.maybe.library.utils.Constants;
 import maybe.phone_lab.org.maybe.library.utils.Utils;
 
 public class PullReceiver extends BroadcastReceiver {
+    private static MaybeService maybeService;
     public PullReceiver() {
     }
 
@@ -24,14 +25,24 @@ public class PullReceiver extends BroadcastReceiver {
             setRepeatAlarm(context, pullIntent);
         } else if (intentAction.equalsIgnoreCase(Constants.PULL_INTENT)) {
             Utils.debug("receive pull intent");
+            this.pull(context);
         } else {
             Utils.debug("receive unknown intent action: " + intentAction);
         }
     }
 
+    private void pull(Context context) {
+        if (maybeService == null) {
+            maybeService = MaybeService.getInstance(context);
+        } else {
+            maybeService.asyncTasks();
+        }
+    }
+
     private void setRepeatAlarm(Context context, Intent intent) {
+        Utils.debug("Set repeat pull for every " + (Constants.PULL_INTERVAL / 1000) + " seconds");
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis() + Constants.PULL_INTERVAL, Constants.PULL_INTERVAL, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis(), Constants.PULL_INTERVAL, pendingIntent);
     }
 }

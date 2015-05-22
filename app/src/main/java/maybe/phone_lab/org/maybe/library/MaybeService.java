@@ -1,4 +1,4 @@
-package maybe.phone_lab.org.maybe.library.utils;
+package maybe.phone_lab.org.maybe.library;
 
 import android.content.Context;
 import android.telephony.TelephonyManager;
@@ -22,6 +22,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import maybe.phone_lab.org.maybe.library.utils.Constants;
+import maybe.phone_lab.org.maybe.library.utils.Utils;
+
 /**
  * Created by xcv58 on 5/8/15.
  */
@@ -30,9 +33,12 @@ public class MaybeService {
 
     public static MaybeService getInstance(Context context) {
         if (maybeService == null) {
+            Utils.debug("maybeService is null, init it!");
             synchronized (MaybeService.class) {
                 maybeService = new MaybeService(context);
             }
+        } else {
+            Utils.debug("maybeService is not null, just return!");
         }
         return maybeService;
     }
@@ -56,7 +62,6 @@ public class MaybeService {
             // TODO: Try GET, if not found (404) or , then POST with deviceID and registrationId (if have)
             // TODO: if something stale, then PUT to update
             JSONObject getResponseJSON = this.get();
-            JSONObject choices = null;
             try {
                 JSONObject deviceJSON = this.getDeviceJSON();
                 int responseCode = getResponseJSON.getInt(Constants.RESPONSE_CODE);
@@ -105,7 +110,7 @@ public class MaybeService {
                 connection.setRequestMethod("GET");
 
                 getResponseJSON  = Utils.getResponseJSONObject(connection);
-                Utils.debug(getResponseJSON.toString());
+                Utils.debug("GET response: " + getResponseJSON.toString());
             } catch (Exception e) {
                 Utils.debug(e);
             } finally {
@@ -167,7 +172,7 @@ public class MaybeService {
                 writer.close();
 
                 putResponseJSON  = Utils.getResponseJSONObject(connection);
-                Utils.debug(putResponseJSON.toString());
+                Utils.debug("PUT response: " + putResponseJSON.toString());
             } catch (Exception e) {
                 Utils.debug(e);
             } finally {
@@ -178,6 +183,10 @@ public class MaybeService {
         }
 
         private void GCM() {
+            if (registrationId != Constants.NO_REGISTRATION_ID) {
+                Utils.debug("already register for GCM, skip it");
+                return;
+            }
             if (checkPlayServices()) {
                 GoogleCloudMessaging googleCloudMessaging = GoogleCloudMessaging.getInstance(mContext);
                 registrationId = this.registerInBackground(googleCloudMessaging);
@@ -211,6 +220,7 @@ public class MaybeService {
                     Utils.debug(label + ": " + choice);
                     variableMap.put(label, choice);
                 }
+                flush();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -259,7 +269,7 @@ public class MaybeService {
         this.asyncTasks();
     }
 
-    private void asyncTasks() {
+    protected void asyncTasks() {
         Thread thread = new Thread(new AsyncTask());
         thread.start();
     }

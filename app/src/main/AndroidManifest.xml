@@ -13,7 +13,7 @@
         </service>
 
         <receiver
-            android:name="maybe.phone_lab.org.maybe.library.receivers.PullReceiver" >
+            android:name="maybe.phone_lab.org.maybe.library.PullReceiver" >
             <intent-filter android:priority="1">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="maybe.phone_lab.org.maybe.library.pull_intent" />
