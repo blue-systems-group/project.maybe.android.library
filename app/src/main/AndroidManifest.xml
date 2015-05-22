@@ -16,6 +16,14 @@
             android:name=".TestActivity"
             android:label="@string/title_activity_test" >
         </activity>
+
+        <receiver
+            android:name=".receivers.PullReceiver" >
+            <intent-filter android:priority="1">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="maybe.phone_lab.org.maybe_library.pull_intent" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -4,6 +4,9 @@ package maybe.phone_lab.org.maybelibrary.utils;
  * Created by xcv58 on 5/21/15.
  */
 public class Constants {
+    public static final long PULL_INTERVAL = 1000L * 60L;
+    public static final String PULL_INTENT = "maybe.phone_lab.org.maybe_library.pull_intent";
+
     public static final String TAG = "Maybe_Library";
 
     public static final String MAP_FILE = "MAP_FILE";
@@ -42,7 +45,4 @@ public class Constants {
     public static final int STATUS_UNAUTHORIZED = 401;
     public static final int STATUS_FORBIDDEN = 403;
     public static final int STATUS_NOT_FOUND = 404;
-
-
-
 }
