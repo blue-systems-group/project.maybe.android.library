@@ -331,4 +331,10 @@ public class MaybeService {
         }
         return choice;
     }
+
+    public void log(JSONObject logJSONObject) {
+        // TODO: 1. add device related data: device_id, timestamp, current battery status, etc.
+        // TODO: 2. cache the logJSONObject
+        // TODO: 3. batch upload
+    }
 }
