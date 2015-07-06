@@ -6,6 +6,7 @@ import android.telephony.TelephonyManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -188,19 +189,22 @@ public class MaybeService {
                 return;
             }
             if (checkPlayServices()) {
-                GoogleCloudMessaging googleCloudMessaging = GoogleCloudMessaging.getInstance(mContext);
-                registrationId = this.registerInBackground(googleCloudMessaging);
-                if (registrationId.equals(Constants.NO_REGISTRATION_ID)) {
-                    Utils.debug("register Google Cloud Messaging failed!");
-                } else {
-                    Utils.debug("registration id: " + registrationId);
+                InstanceID instanceID = InstanceID.getInstance(mContext);
+                try {
+                    registrationId = instanceID.getToken(Constants.SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE);
+                    if (registrationId.equals(Constants.NO_REGISTRATION_ID)) {
+                        Utils.debug("register Google Cloud Messaging failed!");
+                    } else {
+                        Utils.debug("registration id: " + registrationId);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
 
         // TODO: store registrationId locally
 //        private String getRegistrationId() {
-//
 //        }
 
         private void jsonToHashMap(JSONObject deviceChoiceJSONObject) {
@@ -226,15 +230,6 @@ public class MaybeService {
             }
         }
 
-        private String registerInBackground(GoogleCloudMessaging googleCloudMessaging) {
-            try {
-                return googleCloudMessaging.register(SENDER_ID);
-            } catch (IOException e) {
-                Utils.debug(e);
-                return Constants.NO_REGISTRATION_ID;
-            }
-        }
-
         private boolean checkPlayServices() {
             int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
             if (resultCode != ConnectionResult.SUCCESS) {
@@ -253,7 +248,6 @@ public class MaybeService {
     private static String registrationId = Constants.NO_REGISTRATION_ID;
     // TODO: add set method for url and sender id
     private static String MAYBE_SERVER_URL = "https://maybe.xcv58.me/maybe-api-v1/devices/";
-    private static String SENDER_ID = "1068479230660";
 
 
     private MaybeService(Context context) {

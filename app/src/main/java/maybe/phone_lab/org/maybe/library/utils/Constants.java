@@ -7,6 +7,8 @@ public class Constants {
     public static final long PULL_INTERVAL = 1000L * 60L;
     public static final String PULL_INTENT = "maybe.phone_lab.org.maybe.library.pull_intent";
 
+    public static final String SENDER_ID = "1068479230660";
+
     public static final String TAG = "Maybe_Library";
 
     public static final String MAP_FILE = "MAP_FILE";
