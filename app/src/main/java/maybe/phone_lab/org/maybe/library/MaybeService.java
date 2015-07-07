@@ -1,6 +1,9 @@
 package maybe.phone_lab.org.maybe.library;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.telephony.TelephonyManager;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -12,7 +15,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -243,20 +248,63 @@ public class MaybeService {
             }
             return true;
         }
+
+        public void log(JSONObject logJSONObject) {
+            // TODO: 1. add device related data: device_id, timestamp, current battery status, etc.
+            // TODO: 2. cache the logJSONObject
+            // TODO: 3. batch upload
+            //upload files to handle concurrency, handle resend.
+            Utils.debug("input log JSON : " + logJSONObject.toString());
+            try {
+                JSONObject deviceJSONObject = new JSONObject();
+                long timeElapsed = System.currentTimeMillis();
+                float batteryLevel = getBatteryLevel();
+
+                //deviceJSONObject.put("device_id",logJSONObject.getJSONObject(Constants.DEVICE_ID));
+                deviceJSONObject.put("timestamp",timeElapsed);
+                deviceJSONObject.put("batterystatus",batteryLevel);
+                deviceJSONObject.put(Constants.DEVICE_ID, mDeviceMEID);
+
+                //logic to save into file locally
+                String localCache = "Local Cache";
+                String toWriteLogString = deviceJSONObject.toString();
+                FileOutputStream fos = mContext.openFileOutput(localCache, Context.MODE_PRIVATE);
+                fos.write(toWriteLogString.getBytes());
+                fos.close();
+
+                //check cache size and post if > 4kb
+
+                //JSONObject responseJSON = post(deviceJSONObject);
+
+            } catch (JSONException | IOException e ) {
+                e.printStackTrace();
+            }
+        }
+
+        public float getBatteryLevel() {
+            Intent batteryIntent = mContext.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+            return ((float) level / (float) scale) * 100.0f;
+        }
     }
 
     private Context mContext;
     private String mDeviceMEID;
     private String packageName;
     private HashMap<String, Integer> variableMap;
+    private JSONArray logJSONArray = new JSONArray();
+
 
     private static String registrationId = Constants.NO_REGISTRATION_ID;
     // TODO: add set method for url and sender id
-    private static String MAYBE_SERVER_URL = "https://maybe.xcv58.me/maybe-api-v1/devices/";
+    private static String MAYBE_SERVER_URL = "https://maybe.xcv58.me/maybe-api-v1/logs/";
     private static String SENDER_ID = "1068479230660";
+    private static int label_count = 0;
+    private static final long MAX_SIZE = 4096;
 
 
-    private MaybeService(Context context) {
+     private MaybeService(Context context) {
         mContext = context;
         // get MEID
         this.getDeviceMEID();
@@ -332,9 +380,4 @@ public class MaybeService {
         return choice;
     }
 
-    public void log(JSONObject logJSONObject) {
-        // TODO: 1. add device related data: device_id, timestamp, current battery status, etc.
-        // TODO: 2. cache the logJSONObject
-        // TODO: 3. batch upload
-    }
 }
