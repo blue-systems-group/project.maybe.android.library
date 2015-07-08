@@ -266,16 +266,28 @@ public class MaybeService {
                 deviceJSONObject.put(Constants.DEVICE_ID, mDeviceMEID);
 
                 //logic to save into file locally
-                String localCache = "Local Cache";
+                String localCache = "Local Cache" + label_count;
+                label_count++;
                 String toWriteLogString = deviceJSONObject.toString();
                 FileOutputStream fos = mContext.openFileOutput(localCache, Context.MODE_PRIVATE);
                 fos.write(toWriteLogString.getBytes());
                 fos.close();
 
-                //check cache size and post if > 4kb
-
-                //JSONObject responseJSON = post(deviceJSONObject);
-
+                //upload to server after max size limit is reached
+                file_size = Integer.parseInt(String.valueOf(localCache.length()));
+                if(file_size >= MAX_SIZE) {
+                    JSONObject responseJSON = post(deviceJSONObject);
+                    int responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
+                    while (responseCode != Constants.STATUS_CREATED) {
+                        Utils.debug("POST failed, now retrying: " + deviceJSONObject.toString());
+                        responseJSON = post(deviceJSONObject);
+                        responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
+                    }
+                    Utils.debug("POST success: " + deviceJSONObject.toString());
+                    // delete cache file after upload
+                    Boolean bFileDeleted = mContext.deleteFile(localCache);
+                    Utils.debug(localCache + "deleted :" + bFileDeleted);
+                }
             } catch (JSONException | IOException e ) {
                 e.printStackTrace();
             }
@@ -295,13 +307,13 @@ public class MaybeService {
     private HashMap<String, Integer> variableMap;
     private JSONArray logJSONArray = new JSONArray();
 
-
     private static String registrationId = Constants.NO_REGISTRATION_ID;
     // TODO: add set method for url and sender id
     private static String MAYBE_SERVER_URL = "https://maybe.xcv58.me/maybe-api-v1/logs/";
     private static String SENDER_ID = "1068479230660";
     private static int label_count = 0;
     private static final long MAX_SIZE = 4096;
+    private static float file_size = 0;
 
 
      private MaybeService(Context context) {
