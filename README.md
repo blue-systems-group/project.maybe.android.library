@@ -1,23 +1,23 @@
 # MaybeLibrary
-Maybe Library, under develop, NOT ready for use!
+Maybe Library is under development and NOT ready for use!
 
 # Usage
-## build without IDE
-You can build this project without IDE. Run this command in terminal:
+## building without an IDE
+For building this project without an IDE, run this command in terminal:
 
 ```bash
 ./gradlew assembleDebug
 ```
-Then you can get a file:
+You will get a file in the path :
 ```
 app/build/outputs/aar/app-debug.aar
 ```
 
-The ```app-debug.aar``` is maybe library. You can use this ```aar``` file in other Android project.
+The ```app-debug.aar``` is the 'maybe' library. You can use this ```aar``` file in other Android projects.
 
 
-## build with IDE
-This project only support Android Studio.
+## building with an IDE
+This project only supports Android Studio.
 
 1. open the folder in Android Studio
 2. open Run/Debug Configurations, Toolbar -> Run -> Edit Configurations...
