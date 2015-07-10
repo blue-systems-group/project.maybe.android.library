@@ -4,7 +4,7 @@ android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
     defaultConfig {
-        applicationId 'maybe.phone_lab.org.maybelibrarydemo'
+        applicationId 'org.phone_lab.maybe.library.demo'
         minSdkVersion 19
         targetSdkVersion 22
         versionCode 1
