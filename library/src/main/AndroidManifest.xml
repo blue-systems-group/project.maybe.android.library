@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.phone_lab.maybe.library" >
+    package="org.phone_lab.maybe.library">
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <service
             android:name="org.phone_lab.maybe.library.QueryIntentService"
-            android:exported="false" >
-        </service>
+            android:exported="false"></service>
 
-        <receiver
-            android:name="org.phone_lab.maybe.library.PullReceiver" >
+        <receiver android:name="org.phone_lab.maybe.library.PullReceiver">
             <intent-filter android:priority="1">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="maybe.phone_lab.org.maybe.library.pull_intent" />
@@ -24,7 +22,7 @@
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <category android:name="maybe.phone_lab.org.maybe.library" />
@@ -34,7 +32,7 @@
 
         <service
             android:name=".MyGcmListenerService"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
@@ -43,7 +41,7 @@
             android:name=".MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID"/>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
     </application>
