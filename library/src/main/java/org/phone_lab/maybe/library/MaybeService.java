@@ -350,7 +350,7 @@ public class MaybeService {
     private static String registrationId = Constants.NO_REGISTRATION_ID;
     // TODO: add set method for url and sender id
 
-    private static String MAYBE_SERVER_URL_DEVICE = "https://maybe.xcv58.me/maybe-api-v1/logs/";
+    private static String MAYBE_SERVER_URL_DEVICE = "https://maybe.xcv58.me/maybe-api-v1/devices/";
     private static String MAYBE_SERVER_URL_LOG = "https://maybe.xcv58.me/maybe-api-v1/logs/";
 
     private static String SENDER_ID = "1068479230660";
