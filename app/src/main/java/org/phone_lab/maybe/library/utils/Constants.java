@@ -1,4 +1,4 @@
-package maybe.phone_lab.org.maybe.library.utils;
+package org.phone_lab.maybe.library.utils;
 
 /**
  * Created by xcv58 on 5/21/15.

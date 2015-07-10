@@ -1,8 +1,9 @@
-package maybe.phone_lab.org.maybe.library;
+package org.phone_lab.maybe.library;
 
 import com.google.android.gms.iid.InstanceIDListenerService;
 
-import maybe.phone_lab.org.maybe.library.utils.Utils;
+import org.phone_lab.maybe.library.utils.Utils;
+
 
 /**
  * Created by xcv58 on 7/6/15.

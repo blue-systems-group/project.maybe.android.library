@@ -1,4 +1,4 @@
-package maybe.phone_lab.org.maybe.library;
+package org.phone_lab.maybe.library;
 
 import android.content.Context;
 import android.telephony.TelephonyManager;
@@ -11,6 +11,8 @@ import com.google.android.gms.iid.InstanceID;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.phone_lab.maybe.library.utils.Constants;
+import org.phone_lab.maybe.library.utils.Utils;
 
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -23,8 +25,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import maybe.phone_lab.org.maybe.library.utils.Constants;
-import maybe.phone_lab.org.maybe.library.utils.Utils;
 
 /**
  * Created by xcv58 on 5/8/15.
@@ -49,6 +49,8 @@ public class MaybeService {
         @Override
         public void run() {
             // TODO: handle no internet, basically try to re-run below codes after fixed time.
+            String processName = mContext.getApplicationInfo().processName;
+            Utils.debug(processName);
             this.GCM();
             this.maybeServer();
         }

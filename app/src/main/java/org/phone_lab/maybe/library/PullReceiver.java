@@ -1,4 +1,4 @@
-package maybe.phone_lab.org.maybe.library;
+package org.phone_lab.maybe.library;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -6,8 +6,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import maybe.phone_lab.org.maybe.library.utils.Constants;
-import maybe.phone_lab.org.maybe.library.utils.Utils;
+import org.phone_lab.maybe.library.utils.Constants;
+import org.phone_lab.maybe.library.utils.Utils;
+
 
 public class PullReceiver extends BroadcastReceiver {
     private static MaybeService maybeService;

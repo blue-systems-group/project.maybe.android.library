@@ -1,4 +1,4 @@
-package maybe.phone_lab.org.maybe.library;
+package org.phone_lab.maybe.library;
 
 import android.app.NotificationManager;
 import android.media.RingtoneManager;
@@ -7,7 +7,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
-import maybe.phone_lab.org.maybe.library.utils.Utils;
+import org.phone_lab.maybe.library.utils.Utils;
 
 /**
  * Created by xcv58 on 7/6/15.
