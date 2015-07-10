@@ -18,7 +18,6 @@ import org.phone_lab.maybe.library.utils.Constants;
 import org.phone_lab.maybe.library.utils.Utils;
 
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -117,7 +116,7 @@ public class MaybeService {
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
 
-                getResponseJSON  = Utils.getResponseJSONObject(connection);
+                getResponseJSON = Utils.getResponseJSONObject(connection);
                 Utils.debug("GET response: " + getResponseJSON.toString());
             } catch (Exception e) {
                 Utils.debug(e);
@@ -180,7 +179,7 @@ public class MaybeService {
                 writer.write(deviceJSONObject.toString());
                 writer.close();
 
-                putResponseJSON  = Utils.getResponseJSONObject(connection);
+                putResponseJSON = Utils.getResponseJSONObject(connection);
                 Utils.debug("PUT response: " + putResponseJSON.toString());
             } catch (Exception e) {
                 Utils.debug(e);
@@ -252,7 +251,7 @@ public class MaybeService {
 
     private class LogTask implements Runnable {
 
-        public void run () {
+        public void run() {
 
             JSONObject logJSONObject = new JSONObject();
             this.log(logJSONObject);
@@ -271,8 +270,8 @@ public class MaybeService {
                 float batteryLevel = getBatteryLevel();
 
                 //deviceJSONObject.put("device_id",logJSONObject.getJSONObject(Constants.DEVICE_ID));
-                deviceJSONObject.put("timestamp",timeElapsed);
-                deviceJSONObject.put("batterystatus",batteryLevel);
+                deviceJSONObject.put("timestamp", timeElapsed);
+                deviceJSONObject.put("batterystatus", batteryLevel);
                 deviceJSONObject.put(Constants.DEVICE_ID, mDeviceMEID);
 
                 //logic to save into file locally
@@ -285,7 +284,7 @@ public class MaybeService {
 
                 //upload to server after max size limit is reached
                 file_size = Integer.parseInt(String.valueOf(localCache.length()));
-                if(file_size >= MAX_SIZE) {
+                if (file_size >= MAX_SIZE) {
                     JSONObject responseJSON = post(deviceJSONObject);
                     int responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
                     while (responseCode != Constants.STATUS_CREATED) {
@@ -298,7 +297,7 @@ public class MaybeService {
                     Boolean bFileDeleted = mContext.deleteFile(localCache);
                     Utils.debug(localCache + "deleted :" + bFileDeleted);
                 }
-            } catch (JSONException | IOException e ) {
+            } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
         }
@@ -360,7 +359,7 @@ public class MaybeService {
     private static float file_size = 0;
 
 
-     private MaybeService(Context context) {
+    private MaybeService(Context context) {
         mContext = context;
         // get MEID
         this.getDeviceMEID();
@@ -386,7 +385,7 @@ public class MaybeService {
     }
 
     private String getDeviceMEID() {
-        if(mDeviceMEID == null){
+        if (mDeviceMEID == null) {
             TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             mDeviceMEID = tm.getDeviceId();
             Utils.debug("getDeviceMEID() return: " + mDeviceMEID);

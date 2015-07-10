@@ -12,6 +12,7 @@ import org.phone_lab.maybe.library.utils.Utils;
 
 public class PullReceiver extends BroadcastReceiver {
     private static MaybeService maybeService;
+
     public PullReceiver() {
     }
 
@@ -20,7 +21,7 @@ public class PullReceiver extends BroadcastReceiver {
         // TODO: This method is called when the BroadcastReceiver is receiving
         // an Intent broadcast.
         String intentAction = intent.getAction();
-        if (intentAction.equalsIgnoreCase(Intent.ACTION_BOOT_COMPLETED)){
+        if (intentAction.equalsIgnoreCase(Intent.ACTION_BOOT_COMPLETED)) {
             Utils.debug("receive BOOT UP intent");
             Intent pullIntent = new Intent(Constants.PULL_INTENT);
             setRepeatAlarm(context, pullIntent);
