@@ -1,4 +1,4 @@
-package maybe.phone_lab.org.maybelibrarydemo;
+package org.phone_lab.maybe.library.demo;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,8 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.phone_lab.maybe.library.QueryIntentService;
 import org.phone_lab.maybe.library.MaybeService;
+import org.phone_lab.maybe.library.QueryIntentService;
 import org.phone_lab.maybe.library.utils.Utils;
 
 /**

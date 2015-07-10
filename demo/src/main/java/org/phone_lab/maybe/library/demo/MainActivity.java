@@ -1,4 +1,4 @@
-package maybe.phone_lab.org.maybelibrarydemo;
+package org.phone_lab.maybe.library.demo;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
