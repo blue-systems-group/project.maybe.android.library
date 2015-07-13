@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.json.JSONObject;
 import org.phone_lab.maybe.library.MaybeService;
 import org.phone_lab.maybe.library.QueryIntentService;
 import org.phone_lab.maybe.library.utils.Utils;
@@ -26,6 +27,7 @@ public class MainActivityFragment extends Fragment {
         maybeService = MaybeService.getInstance(getActivity().getApplicationContext());
 //        this.testIntentService();
         this.testMaybeVariable();
+        this.logMaybe();
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
@@ -44,6 +46,11 @@ public class MainActivityFragment extends Fragment {
             default:
                 break;
         }
+    }
+
+    public void logMaybe() {
+        JSONObject logJSONObject = new JSONObject();
+        maybeService.log();
     }
 
     private void testIntentService() {

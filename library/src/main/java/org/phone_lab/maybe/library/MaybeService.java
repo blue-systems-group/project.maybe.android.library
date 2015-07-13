@@ -268,8 +268,6 @@ public class MaybeService {
                 JSONObject deviceJSONObject = new JSONObject();
                 long timeElapsed = System.currentTimeMillis();
                 float batteryLevel = getBatteryLevel();
-
-                //deviceJSONObject.put("device_id",logJSONObject.getJSONObject(Constants.DEVICE_ID));
                 deviceJSONObject.put("timestamp", timeElapsed);
                 deviceJSONObject.put("batterystatus", batteryLevel);
                 deviceJSONObject.put(Constants.DEVICE_ID, mDeviceMEID);
@@ -284,15 +282,21 @@ public class MaybeService {
 
                 //upload to server after max size limit is reached
                 file_size = Integer.parseInt(String.valueOf(localCache.length()));
-                if (file_size >= MAX_SIZE) {
+                if(file_size >= MAX_SIZE) {
                     JSONObject responseJSON = post(deviceJSONObject);
+                    int sendCounter = 3;
                     int responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
-                    while (responseCode != Constants.STATUS_CREATED) {
+                    while (sendCounter > 0 && responseCode != Constants.STATUS_CREATED) {
                         Utils.debug("POST failed, now retrying: " + deviceJSONObject.toString());
                         responseJSON = post(deviceJSONObject);
+                        sendCounter--;
                         responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
                     }
-                    Utils.debug("POST success: " + deviceJSONObject.toString());
+                    if(sendCounter == 0) {
+                        Utils.debug("POST failed: " + deviceJSONObject.toString());
+                    } else {
+                        Utils.debug("POST success: " + deviceJSONObject.toString());
+                    }
                     // delete cache file after upload
                     Boolean bFileDeleted = mContext.deleteFile(localCache);
                     Utils.debug(localCache + "deleted :" + bFileDeleted);

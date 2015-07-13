@@ -17,6 +17,11 @@
                 <action android:name="maybe.phone_lab.org.maybe.library.pull_intent" />
             </intent-filter>
         </receiver>
+        <!--[START log_intentserver] -->
+        <service
+            android:name="org.phone_lab.maybe.library.LogIntentService"
+            android:exported="false"></service>
+        <!--[END log_intentserver] -->
 
         <!-- [START gcm_receiver] -->
         <receiver
