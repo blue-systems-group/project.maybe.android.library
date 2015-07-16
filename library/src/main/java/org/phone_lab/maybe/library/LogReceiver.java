@@ -10,10 +10,10 @@ import org.phone_lab.maybe.library.utils.Constants;
 import org.phone_lab.maybe.library.utils.Utils;
 
 
-public class PullReceiver extends BroadcastReceiver {
+public class LogReceiver extends BroadcastReceiver {
     private static MaybeService maybeService;
 
-    public PullReceiver() {
+    public LogReceiver() {
     }
 
     @Override
@@ -24,7 +24,7 @@ public class PullReceiver extends BroadcastReceiver {
         if (intentAction.equalsIgnoreCase(Intent.ACTION_BOOT_COMPLETED)) {
             Utils.debug("receive BOOT UP intent");
             Intent pullIntent = new Intent(Constants.PULL_INTENT);
-            setRepeatAlarm(context, pullIntent);
+//            setRepeatAlarm(context, pullIntent);
 
         } else if (intentAction.equalsIgnoreCase(Constants.PULL_INTENT)) {
             Utils.debug("receive pull intent");

@@ -3,6 +3,7 @@ package org.phone_lab.maybe.library;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.telephony.TelephonyManager;
 
@@ -18,6 +19,7 @@ import org.phone_lab.maybe.library.utils.Constants;
 import org.phone_lab.maybe.library.utils.Utils;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -274,7 +276,6 @@ public class MaybeService {
 
                 //logic to save into file locally
                 String localCache = "Local Cache" + label_count;
-                label_count++;
                 String toWriteLogString = deviceJSONObject.toString();
                 FileOutputStream fos = mContext.openFileOutput(localCache, Context.MODE_PRIVATE);
                 fos.write(toWriteLogString.getBytes());
@@ -283,23 +284,12 @@ public class MaybeService {
                 //upload to server after max size limit is reached
                 file_size = Integer.parseInt(String.valueOf(localCache.length()));
                 if(file_size >= MAX_SIZE) {
-                    JSONObject responseJSON = post(deviceJSONObject);
-                    int sendCounter = 3;
-                    int responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
-                    while (sendCounter > 0 && responseCode != Constants.STATUS_CREATED) {
-                        Utils.debug("POST failed, now retrying: " + deviceJSONObject.toString());
-                        responseJSON = post(deviceJSONObject);
-                        sendCounter--;
-                        responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
-                    }
-                    if(sendCounter == 0) {
-                        Utils.debug("POST failed: " + deviceJSONObject.toString());
-                    } else {
-                        Utils.debug("POST success: " + deviceJSONObject.toString());
-                    }
-                    // delete cache file after upload
-                    Boolean bFileDeleted = mContext.deleteFile(localCache);
-                    Utils.debug(localCache + "deleted :" + bFileDeleted);
+                    Intent logIntent = new Intent(mContext,LogIntentService.class);
+                    logIntent.setAction("maybe.phone_lab.org.maybelibrary.action.LOG");
+                    File file = new File(mContext.getCacheDir(),localCache);
+                    logIntent.putExtra("Local Cache",Uri.fromFile(file));
+                    mContext.startService(logIntent);
+                    label_count++;
                 }
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
@@ -313,36 +303,6 @@ public class MaybeService {
             return ((float) level / (float) scale) * 100.0f;
         }
 
-        private JSONObject post(JSONObject deviceJSONObject) {
-            Utils.debug("POST to " + MAYBE_SERVER_URL_LOG + " -d " + deviceJSONObject.toString());
-            HttpURLConnection connection = null;
-            JSONObject postResponseJSON = null;
-            try {
-                URL url = new URL(MAYBE_SERVER_URL_LOG);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
-
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("Accept", "application/json");
-
-                connection.setDoOutput(true);
-                connection.setChunkedStreamingMode(0);
-
-                OutputStreamWriter writer = new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
-                writer.write(deviceJSONObject.toString());
-                writer.close();
-
-                postResponseJSON = Utils.getResponseJSONObject(connection);
-                Utils.debug("POST response: " + postResponseJSON.toString());
-            } catch (Exception e) {
-                Utils.debug(e);
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-            }
-            return postResponseJSON;
-        }
 
     }
 
@@ -355,8 +315,6 @@ public class MaybeService {
     // TODO: add set method for url and sender id
 
     private static String MAYBE_SERVER_URL_DEVICE = "https://maybe.xcv58.me/maybe-api-v1/devices/";
-    private static String MAYBE_SERVER_URL_LOG = "https://maybe.xcv58.me/maybe-api-v1/logs/";
-
     private static String SENDER_ID = "1068479230660";
     private static int label_count = 0;
     private static final long MAX_SIZE = 4096;
