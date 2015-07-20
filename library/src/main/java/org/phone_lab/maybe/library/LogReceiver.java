@@ -11,6 +11,7 @@ import org.phone_lab.maybe.library.utils.Utils;
 
 
 public class LogReceiver extends BroadcastReceiver {
+
     private static MaybeService maybeService;
 
     public LogReceiver() {

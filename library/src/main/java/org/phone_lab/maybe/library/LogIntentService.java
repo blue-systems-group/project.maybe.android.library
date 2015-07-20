@@ -2,10 +2,12 @@ package org.phone_lab.maybe.library;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 
 import org.json.JSONObject;
 import org.phone_lab.maybe.library.MaybeService;
+import org.phone_lab.maybe.library.utils.Constants;
 import org.phone_lab.maybe.library.utils.Utils;
 
 import java.io.BufferedOutputStream;
@@ -14,7 +16,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
+/*
  * Created by ramyarao on 7/13/15.
  */
 public class LogIntentService extends IntentService {
@@ -22,6 +24,7 @@ public class LogIntentService extends IntentService {
     private static final String ACTION_LOG = "maybe.phone_lab.org.maybelibrary.action.LOG";
     private MaybeService maybeService;
     private static String MAYBE_SERVER_URL_LOG = "https://maybe.xcv58.me/maybe-api-v1/logs/";
+    SharedPreferences prefs = getApplicationContext().getSharedPreferences("CacheFile", MODE_PRIVATE);
     @Override
     protected void onHandleIntent(Intent intent) {
         Utils.debug("onHandleIntent of Log");
@@ -31,8 +34,18 @@ public class LogIntentService extends IntentService {
                 maybeService = MaybeService.getInstance(getApplicationContext());
                 //TODO : POST Operation + cache file deletion
                 //TODO : retry post 3 time
-                String cacheFile = intent.getExtras().getString("Local Cache");
-                Uri fileUri = intent.getData();
+                String fileName =   prefs.getString("PreviousCache", null);
+                if (fileName!= null) {
+                    String cacheFile = intent.getStringExtra(fileName);
+                    Uri fileUri = intent.getData();
+                    new File(fileUri.getPath());
+                    int sendCounter = 2;
+                    JSONObject responseJSON,deviceJSONObject;
+                    //todo: 1.post,
+                    //todo: 2.failure handling of post,
+                    //todo: 3.delete local cache
+                }
+
 //                   JSONObject responseJSON = post(deviceJSONObject);
 //                    int sendCounter = 3;
 //                    int responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
@@ -47,8 +60,8 @@ public class LogIntentService extends IntentService {
 //                    } else {
 //                        Utils.debug("POST success: " + deviceJSONObject.toString());
 //                    }
-                //                    //delete cache file after upload
-//                    Boolean bFileDeleted = mContext.deleteFile(localCache);
+//                                    //delete cache file after upload
+//                    Boolean bFileDeleted = getApplicationContext().deleteFile(localCache);
 //                    Utils.debug(localCache + "deleted :" + bFileDeleted);
 
             }

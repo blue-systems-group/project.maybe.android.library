@@ -3,6 +3,7 @@ package org.phone_lab.maybe.library;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.telephony.TelephonyManager;
@@ -32,7 +33,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 
-/**
+/*
  * Created by xcv58 on 5/8/15.
  */
 public class MaybeService {
@@ -260,10 +261,6 @@ public class MaybeService {
         }
 
         public void log(JSONObject logJSONObject) {
-            // TODO: 1. add device related data: device_id, timestamp, current battery status, etc.
-            // TODO: 2. cache the logJSONObject
-            // TODO: 3. batch upload
-            //upload files to handle concurrency, handle resend.
 
             Utils.debug("input log JSON : " + logJSONObject.toString());
             try {
@@ -275,19 +272,25 @@ public class MaybeService {
                 deviceJSONObject.put(Constants.DEVICE_ID, mDeviceMEID);
 
                 //logic to save into file locally
-                String localCache = "Local Cache" + label_count;
+                String localCache = "LocalCache" + label_count;
+                SharedPreferences.Editor editor = mContext.getSharedPreferences("CacheFile",
+                        Context.MODE_PRIVATE).edit();
+                editor.putString("PreviousCache",localCache);
+                editor.commit();
                 String toWriteLogString = deviceJSONObject.toString();
+                Utils.debug("JSON content " + toWriteLogString);
                 FileOutputStream fos = mContext.openFileOutput(localCache, Context.MODE_PRIVATE);
                 fos.write(toWriteLogString.getBytes());
                 fos.close();
 
                 //upload to server after max size limit is reached
-                file_size = Integer.parseInt(String.valueOf(localCache.length()));
+                float file_size = Integer.parseInt(String.valueOf(localCache.length()));
                 if(file_size >= MAX_SIZE) {
                     Intent logIntent = new Intent(mContext,LogIntentService.class);
                     logIntent.setAction("maybe.phone_lab.org.maybelibrary.action.LOG");
                     File file = new File(mContext.getCacheDir(),localCache);
-                    logIntent.putExtra("Local Cache",Uri.fromFile(file));
+                    logIntent.putExtra(localCache ,Uri.fromFile(file));
+                    Utils.debug("Log Intent Service invoked for file: " + file.toString());
                     mContext.startService(logIntent);
                     label_count++;
                 }
@@ -303,7 +306,6 @@ public class MaybeService {
             return ((float) level / (float) scale) * 100.0f;
         }
 
-
     }
 
     private Context mContext;
@@ -318,8 +320,6 @@ public class MaybeService {
     private static String SENDER_ID = "1068479230660";
     private static int label_count = 0;
     private static final long MAX_SIZE = 4096;
-    private static float file_size = 0;
-
 
     private MaybeService(Context context) {
         mContext = context;

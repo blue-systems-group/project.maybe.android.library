@@ -7,8 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.json.JSONObject;
-import org.phone_lab.maybe.library.LogIntentService;
 import org.phone_lab.maybe.library.MaybeService;
 import org.phone_lab.maybe.library.QueryIntentService;
 import org.phone_lab.maybe.library.utils.Utils;
