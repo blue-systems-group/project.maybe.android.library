@@ -5,13 +5,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.phone_lab.maybe.library.MaybeService;
 import org.phone_lab.maybe.library.utils.Constants;
 import org.phone_lab.maybe.library.utils.Utils;
+import com.google.gson.Gson;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -32,38 +38,48 @@ public class LogIntentService extends IntentService {
             final String action = intent.getAction();
             if(ACTION_LOG.equals(action)) {
                 maybeService = MaybeService.getInstance(getApplicationContext());
-                //TODO : POST Operation + cache file deletion
-                //TODO : retry post 3 time
                 String fileName =   prefs.getString("PreviousCache", null);
                 if (fileName!= null) {
                     String cacheFile = intent.getStringExtra(fileName);
+                    Utils.debug(cacheFile + "cacheFile :" + cacheFile.toString());
                     Uri fileUri = intent.getData();
-                    new File(fileUri.getPath());
+                    File localFile = new File(fileUri.getPath());
                     int sendCounter = 2;
-                    JSONObject responseJSON,deviceJSONObject;
-                    //todo: 1.post,
-                    //todo: 2.failure handling of post,
-                    //todo: 3.delete local cache
+                    JSONObject responseJSON;
+                    try {
+                        BufferedReader br = new BufferedReader(
+                                new FileReader(localFile));
+                        StringBuilder allLines = new StringBuilder();
+                        String line = "";
+                        while( (line = br.readLine()) != null) {
+                            allLines.append(line);
+                        }
+                        line = "["+allLines.toString()+"]";
+                        JSONObject updatejsonObject = new JSONObject(line);
+                        responseJSON = post(updatejsonObject);
+                        int responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
+                        while (sendCounter > 0 && responseCode != Constants.STATUS_CREATED) {
+                            Utils.debug("POST failed, now retrying: " + updatejsonObject.toString());
+                            responseJSON = post(updatejsonObject);
+                            sendCounter--;
+                            responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
+                        }
+                        if(sendCounter == 0) {
+                            Utils.debug("POST failed: " + updatejsonObject.toString());
+                        } else {
+                            Utils.debug("POST success: " + updatejsonObject.toString());
+                        }
+                        //delete cache file after upload
+                        if(localFile.delete()) {
+                            Utils.debug(localFile + "Deleted :" + localFile.toString());
+                        } else {
+                            Utils.debug(localFile + "Not deleted :" + localFile.toString());
+                        }
+
+                    } catch ( JSONException | IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-
-//                   JSONObject responseJSON = post(deviceJSONObject);
-//                    int sendCounter = 3;
-//                    int responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
-//                    while (sendCounter > 0 && responseCode != Constants.STATUS_CREATED) {
-//                        Utils.debug("POST failed, now retrying: " + deviceJSONObject.toString());
-//                        responseJSON = post(deviceJSONObject);
-//                        sendCounter--;
-//                        responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
-//                    }
-//                    if(sendCounter == 0) {
-//                        Utils.debug("POST failed: " + deviceJSONObject.toString());
-//                    } else {
-//                        Utils.debug("POST success: " + deviceJSONObject.toString());
-//                    }
-//                                    //delete cache file after upload
-//                    Boolean bFileDeleted = getApplicationContext().deleteFile(localCache);
-//                    Utils.debug(localCache + "deleted :" + bFileDeleted);
-
             }
         }
     }
