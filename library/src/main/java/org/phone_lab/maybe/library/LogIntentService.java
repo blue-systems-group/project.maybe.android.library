@@ -10,7 +10,6 @@ import org.json.JSONObject;
 import org.phone_lab.maybe.library.MaybeService;
 import org.phone_lab.maybe.library.utils.Constants;
 import org.phone_lab.maybe.library.utils.Utils;
-import com.google.gson.Gson;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
