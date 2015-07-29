@@ -10,10 +10,6 @@ import org.json.JSONObject;
 import org.phone_lab.maybe.library.MaybeService;
 import org.phone_lab.maybe.library.utils.Constants;
 import org.phone_lab.maybe.library.utils.Utils;
-<<<<<<< HEAD
-
-=======
->>>>>>> 9750182eaa23c2ca5d6dc67ed4d2d45305ab5a02
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -57,8 +53,13 @@ public class LogIntentService extends IntentService {
                         while( (line = br.readLine()) != null) {
                             allLines.append(line);
                         }
-                        line = "["+allLines.toString()+"]";
-                        JSONObject updatejsonObject = new JSONObject(line);
+                        long timeElapsed = System.currentTimeMillis();
+                        String label = "1";
+                        String logObject = "["+allLines.toString()+"]";
+                        JSONObject updatejsonObject = new JSONObject();
+                        updatejsonObject.put("timestamp",timeElapsed);
+                        updatejsonObject.put("label",label);
+                        updatejsonObject.put("logObject",logObject);
                         responseJSON = post(updatejsonObject);
                         int responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
                         while (sendCounter > 0 && responseCode != Constants.STATUS_CREATED) {
