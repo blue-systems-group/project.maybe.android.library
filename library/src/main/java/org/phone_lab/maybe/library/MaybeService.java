@@ -288,7 +288,7 @@ public class MaybeService {
                     Intent logIntent = new Intent(mContext,LogIntentService.class);
                     logIntent.setAction("maybe.phone_lab.org.maybelibrary.action.LOG");
                     File file = new File(mContext.getCacheDir(),localCache);
-                    logIntent.putExtra(localCache ,Uri.fromFile(file));
+                    logIntent.putExtra(localCache, Uri.fromFile(file));
                     Utils.debug("Log Intent Service invoked for file: " + file.toString());
                     mContext.startService(logIntent);
                     label_count++;
