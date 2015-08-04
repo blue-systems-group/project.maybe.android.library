@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -36,6 +37,7 @@ import java.util.Iterator;
  * Created by xcv58 on 5/8/15.
  */
 public class MaybeService {
+
     private volatile static MaybeService maybeService;
 
     public static MaybeService getInstance(Context context) {
@@ -235,6 +237,7 @@ public class MaybeService {
                 }
                 flush();
             } catch (JSONException e) {
+                Utils.debug(e);
                 e.printStackTrace();
             }
         }
@@ -255,11 +258,16 @@ public class MaybeService {
 
         public void run() {
 
-            JSONObject logJSONObject = new JSONObject();
             this.log(logJSONObject);
         }
 
-        public void log(JSONObject logJSONObject) {
+        JSONObject logJSONObject;
+
+        public LogTask(JSONObject logObject) {
+            this.logJSONObject = logObject;
+        }
+
+        private void log(JSONObject logJSONObject) {
 
             Utils.debug("input log JSON : " + logJSONObject.toString());
             try {
@@ -268,17 +276,19 @@ public class MaybeService {
                 float batteryLevel = getBatteryLevel();
                 deviceJSONObject.put("timestamp", timeElapsed);
                 deviceJSONObject.put("batterystatus", batteryLevel);
+                deviceJSONObject.put("logObject", logJSONObject);
                 deviceJSONObject.put(Constants.DEVICE_ID, mDeviceMEID);
 
                 //logic to save into file locally
                 String localCache = "LocalCache" + label_count;
+                Utils.debug("LocalCache Name = " + localCache);
                 SharedPreferences.Editor editor = mContext.getSharedPreferences("CacheFile",
                         Context.MODE_PRIVATE).edit();
                 editor.putString("PreviousCache",localCache);
                 editor.commit();
                 String toWriteLogString = deviceJSONObject.toString();
-                Utils.debug("JSON content " + toWriteLogString);
-                FileOutputStream fos = mContext.openFileOutput(localCache, Context.MODE_PRIVATE);
+                Utils.debug("Write Log = " + toWriteLogString);
+                FileOutputStream fos = mContext.openFileOutput(localCache, Context.MODE_APPEND|Context.MODE_PRIVATE);
                 fos.write(toWriteLogString.getBytes());
                 fos.close();
 
@@ -331,8 +341,6 @@ public class MaybeService {
         // TODO: connect to Google Cloud Messaging ASYNC
         // TODO: then connect to server ASYNC
         this.asyncTasks();
-
-        this.log();
     }
 
     protected void asyncTasks() {
@@ -399,9 +407,9 @@ public class MaybeService {
         return choice;
     }
 
-    public void log() {
+    public void log(JSONObject logObject) {
 
-        Thread thread = new Thread(new LogTask());
+        Thread thread = new Thread(new LogTask(logObject));
         thread.start();
     }
 }

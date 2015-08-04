@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,13 +33,14 @@ public class LogIntentService extends IntentService {
     SharedPreferences prefs = getApplicationContext().getSharedPreferences("CacheFile", MODE_PRIVATE);
     @Override
     protected void onHandleIntent(Intent intent) {
-        Utils.debug("onHandleIntent of Log");
+        Utils.debug("On Handle of LogIntent");
         if (intent != null) {
             final String action = intent.getAction();
             if(ACTION_LOG.equals(action)) {
                 maybeService = MaybeService.getInstance(getApplicationContext());
                 String fileName =   prefs.getString("PreviousCache", null);
                 if (fileName!= null) {
+                    Utils.debug("Intent Service File Name : " + fileName);
                     String cacheFile = intent.getStringExtra(fileName);
                     Utils.debug(cacheFile + "cacheFile :" + cacheFile.toString());
                     Uri fileUri = intent.getData();
@@ -55,7 +57,7 @@ public class LogIntentService extends IntentService {
                         }
                         long timeElapsed = System.currentTimeMillis();
                         String label = "1";
-                        String logObject = "["+allLines.toString()+"]";
+                        String logObject = "{"+allLines.toString()+"}";
                         JSONObject updatejsonObject = new JSONObject();
                         updatejsonObject.put("timestamp",timeElapsed);
                         updatejsonObject.put("label",label);
@@ -71,7 +73,7 @@ public class LogIntentService extends IntentService {
                         if(sendCounter == 0) {
                             Utils.debug("POST failed: " + updatejsonObject.toString());
                         } else {
-                            Utils.debug("POST success: " + updatejsonObject.toString());
+                            Utils.debug("POST Success: " + updatejsonObject.toString());
                         }
                         //delete cache file after upload
                         if(localFile.delete()) {

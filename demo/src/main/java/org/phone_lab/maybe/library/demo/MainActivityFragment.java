@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.phone_lab.maybe.library.MaybeService;
 import org.phone_lab.maybe.library.QueryIntentService;
 import org.phone_lab.maybe.library.utils.Utils;
@@ -15,6 +17,7 @@ import org.phone_lab.maybe.library.utils.Utils;
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
+
     private MaybeService maybeService;
 
     public MainActivityFragment() {
@@ -31,7 +34,7 @@ public class MainActivityFragment extends Fragment {
     }
 
     public void testMaybeVariable() {
-        int choice = maybeService.get("label");
+        int choice = maybeService.get("another block test");
         Utils.debug("choice: " + choice);
         switch (choice) {
             case 0:
@@ -48,6 +51,13 @@ public class MainActivityFragment extends Fragment {
     }
 
     public void logMaybe() {
+        JSONObject logging = new JSONObject();
+        try {
+            logging.put("label","test");
+            logging.put("parameter2","testAgain");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         maybeService.log();
     }
 
