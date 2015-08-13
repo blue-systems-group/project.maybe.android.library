@@ -30,10 +30,11 @@ public class LogIntentService extends IntentService {
     private static final String ACTION_LOG = "maybe.phone_lab.org.maybelibrary.action.LOG";
     private MaybeService maybeService;
     private static String MAYBE_SERVER_URL_LOG = "https://maybe.xcv58.me/maybe-api-v1/logs/";
-    SharedPreferences prefs = getApplicationContext().getSharedPreferences("CacheFile", MODE_PRIVATE);
+
     @Override
     protected void onHandleIntent(Intent intent) {
         Utils.debug("On Handle of LogIntent");
+        SharedPreferences prefs = getApplicationContext().getSharedPreferences("CacheFile", MODE_PRIVATE);
         if (intent != null) {
             final String action = intent.getAction();
             if(ACTION_LOG.equals(action)) {
@@ -42,7 +43,7 @@ public class LogIntentService extends IntentService {
                 if (fileName!= null) {
                     Utils.debug("Intent Service File Name : " + fileName);
                     String cacheFile = intent.getStringExtra(fileName);
-                    Utils.debug(cacheFile + "cacheFile :" + cacheFile.toString());
+                    Utils.debug(cacheFile + "cacheFile :" + cacheFile);
                     Uri fileUri = intent.getData();
                     File localFile = new File(fileUri.getPath());
                     int sendCounter = 2;
@@ -82,7 +83,7 @@ public class LogIntentService extends IntentService {
                             Utils.debug(localFile + "Not deleted :" + localFile.toString());
                         }
 
-                    } catch ( JSONException | IOException e) {
+                    } catch ( JSONException |IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -122,7 +123,7 @@ public class LogIntentService extends IntentService {
     }
 
     public LogIntentService() {
-        super("QueryIntentService");
+        super("LogIntentService");
     }
 
 }

@@ -58,7 +58,7 @@ public class MainActivityFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        maybeService.log();
+        maybeService.log(logging);
     }
 
     private void testIntentService() {

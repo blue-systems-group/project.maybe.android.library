@@ -18,6 +18,14 @@ android {
     }
     productFlavors {
     }
+    sourceSets {
+        main.java.srcDirs += 'src/main/java/org.phone_lab.maybe.library.demo/MainActivity'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 }
 
 repositories {
