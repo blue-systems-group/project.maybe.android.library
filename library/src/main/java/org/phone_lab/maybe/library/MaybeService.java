@@ -298,10 +298,11 @@ public class MaybeService {
                 if(file_size >= MAX_SIZE) {
                     Intent logIntent = new Intent(mContext,LogIntentService.class);
                     logIntent.setAction("maybe.phone_lab.org.maybelibrary.action.LOG");
-                    File file = new File(mContext.getCacheDir(),localCache);
-                    logIntent.putExtra(localCache, Uri.fromFile(file));
+                    File file = new File(mContext.getFilesDir().getAbsolutePath());
+                    logIntent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));
+//                    logIntent.putExtra(localCache, Uri.fromFile(file));
                     Utils.debug("Log Intent Service invoked for file: " + file.toString() +
-                            " Cache Dir ="+mContext.getCacheDir()+ " Extra = " + Uri.fromFile(file));
+                            " Cache Dir ="+mContext.getFilesDir().getAbsolutePath()+ " Extra = " + Uri.fromFile(file));
                     mContext.startService(logIntent);
                     label_count++;
                 }

@@ -42,10 +42,12 @@ public class LogIntentService extends IntentService {
                 String fileName =   prefs.getString("PreviousCache", null);
                 if (fileName!= null) {
                     Utils.debug("Intent Service File Name : " + fileName);
-                    String cacheFile = intent.getStringExtra(fileName);
-                    Utils.debug(cacheFile + "cacheFile :" + cacheFile);
-                    Uri fileUri = intent.getData();
+                    Uri fileUri = (Uri)intent.getExtras().get(Intent.EXTRA_STREAM);
+//                    String cacheFile = intent.getStringExtra(fileName);
+//                    Utils.debug(cacheFile + "cacheFile :" + cacheFile);
+//                    Uri fileUri = intent.getData();
                     File localFile = new File(fileUri.getPath());
+                    Utils.debug("localFile path at intent = "+localFile.toString());
                     int sendCounter = 2;
                     JSONObject responseJSON;
                     try {
@@ -56,6 +58,7 @@ public class LogIntentService extends IntentService {
                         while( (line = br.readLine()) != null) {
                             allLines.append(line);
                         }
+                        Utils.debug("line = "+line);
                         long timeElapsed = System.currentTimeMillis();
                         String label = "1";
                         String logObject = "{"+allLines.toString()+"}";
@@ -63,11 +66,12 @@ public class LogIntentService extends IntentService {
                         updatejsonObject.put("timestamp",timeElapsed);
                         updatejsonObject.put("label",label);
                         updatejsonObject.put("logObject",logObject);
+                        Utils.debug("updatejsonObject = " + updatejsonObject.toString());
                         responseJSON = post(updatejsonObject);
                         int responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
+                        Utils.debug("POST failed, now retrying: " + updatejsonObject.toString());
+                        responseJSON = post(updatejsonObject);
                         while (sendCounter > 0 && responseCode != Constants.STATUS_CREATED) {
-                            Utils.debug("POST failed, now retrying: " + updatejsonObject.toString());
-                            responseJSON = post(updatejsonObject);
                             sendCounter--;
                             responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
                         }
