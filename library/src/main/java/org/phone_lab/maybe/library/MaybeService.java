@@ -286,7 +286,7 @@ public class MaybeService {
                         Context.MODE_PRIVATE).edit();
                 editor.putString("PreviousCache",localCache);
                 editor.commit();
-                String toWriteLogString = deviceJSONObject.toString();
+                String toWriteLogString = deviceJSONObject.toString()+"\n";
                 Utils.debug("Write Log = " + toWriteLogString);
                 FileOutputStream fos = mContext.openFileOutput(localCache, Context.MODE_APPEND|Context.MODE_PRIVATE);
                 fos.write(toWriteLogString.getBytes());
@@ -298,7 +298,7 @@ public class MaybeService {
                 if(file_size >= MAX_SIZE) {
                     Intent logIntent = new Intent(mContext,LogIntentService.class);
                     logIntent.setAction("maybe.phone_lab.org.maybelibrary.action.LOG");
-                    File file = new File(mContext.getFilesDir().getAbsolutePath());
+                    File file = new File(mContext.getFilesDir().getAbsolutePath()+"/"+localCache);
                     logIntent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));
 //                    logIntent.putExtra(localCache, Uri.fromFile(file));
                     Utils.debug("Log Intent Service invoked for file: " + file.toString() +

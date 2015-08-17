@@ -1,9 +1,11 @@
 package org.phone_lab.maybe.library;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -29,12 +31,18 @@ public class LogIntentService extends IntentService {
 
     private static final String ACTION_LOG = "maybe.phone_lab.org.maybelibrary.action.LOG";
     private MaybeService maybeService;
+    private String mDeviceMEID;
     private static String MAYBE_SERVER_URL_LOG = "https://maybe.xcv58.me/maybe-api-v1/logs/";
+
 
     @Override
     protected void onHandleIntent(Intent intent) {
         Utils.debug("On Handle of LogIntent");
+        mDeviceMEID = this.getDeviceMEID();
+        Utils.debug("Device ID on intent = "+mDeviceMEID);
+        MAYBE_SERVER_URL_LOG = MAYBE_SERVER_URL_LOG+ mDeviceMEID+ " -d";
         SharedPreferences prefs = getApplicationContext().getSharedPreferences("CacheFile", MODE_PRIVATE);
+        Utils.debug("Shared prefs =" +prefs);
         if (intent != null) {
             final String action = intent.getAction();
             if(ACTION_LOG.equals(action)) {
@@ -57,11 +65,11 @@ public class LogIntentService extends IntentService {
                         String line = "";
                         while( (line = br.readLine()) != null) {
                             allLines.append(line);
+                            Utils.debug(" line = " + line);
                         }
-                        Utils.debug("line = "+line);
                         long timeElapsed = System.currentTimeMillis();
                         String label = "1";
-                        String logObject = "{"+allLines.toString()+"}";
+                        String logObject = allLines.toString();
                         JSONObject updatejsonObject = new JSONObject();
                         updatejsonObject.put("timestamp",timeElapsed);
                         updatejsonObject.put("label",label);
@@ -96,7 +104,7 @@ public class LogIntentService extends IntentService {
     }
 
     private JSONObject post(JSONObject deviceJSONObject) {
-        Utils.debug("POST to " + MAYBE_SERVER_URL_LOG + " -d " + deviceJSONObject.toString());
+        Utils.debug("POST to " + MAYBE_SERVER_URL_LOG + deviceJSONObject.toString());
         HttpURLConnection connection = null;
         JSONObject postResponseJSON = null;
         try {
@@ -124,6 +132,15 @@ public class LogIntentService extends IntentService {
             }
         }
         return postResponseJSON;
+    }
+
+    private String getDeviceMEID() {
+        if (mDeviceMEID == null) {
+            TelephonyManager tm = (TelephonyManager) getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE);
+            mDeviceMEID = tm.getDeviceId();
+            Utils.debug("getDeviceMEID() return: " + mDeviceMEID);
+        }
+        return mDeviceMEID;
     }
 
     public LogIntentService() {
