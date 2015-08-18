@@ -40,7 +40,7 @@ public class LogIntentService extends IntentService {
         Utils.debug("On Handle of LogIntent");
         mDeviceMEID = this.getDeviceMEID();
         Utils.debug("Device ID on intent = "+mDeviceMEID);
-        MAYBE_SERVER_URL_LOG = MAYBE_SERVER_URL_LOG+ mDeviceMEID+ " -d";
+        MAYBE_SERVER_URL_LOG = MAYBE_SERVER_URL_LOG+ mDeviceMEID+ "/testing_inputs.maybe -d";
         SharedPreferences prefs = getApplicationContext().getSharedPreferences("CacheFile", MODE_PRIVATE);
         Utils.debug("Shared prefs =" +prefs);
         if (intent != null) {
@@ -71,6 +71,8 @@ public class LogIntentService extends IntentService {
                         String label = "1";
                         String logObject = allLines.toString();
                         JSONObject updatejsonObject = new JSONObject();
+                        updatejsonObject.put("sha224_hash","1aab3f28f3d0ead580c3c22b10fee7e81c75e6d1e8f957611aedf51e");
+                        updatejsonObject.put("package","testing_inputs.maybe");
                         updatejsonObject.put("timestamp",timeElapsed);
                         updatejsonObject.put("label",label);
                         updatejsonObject.put("logObject",logObject);
@@ -90,9 +92,9 @@ public class LogIntentService extends IntentService {
                         }
                         //delete cache file after upload
                         if(localFile.delete()) {
-                            Utils.debug(localFile + "Deleted :" + localFile.toString());
+                            Utils.debug("Deleted :" + localFile.toString());
                         } else {
-                            Utils.debug(localFile + "Not deleted :" + localFile.toString());
+                            Utils.debug("Not deleted :" + localFile.toString());
                         }
 
                     } catch ( JSONException |IOException e) {
@@ -104,7 +106,7 @@ public class LogIntentService extends IntentService {
     }
 
     private JSONObject post(JSONObject deviceJSONObject) {
-        Utils.debug("POST to " + MAYBE_SERVER_URL_LOG + deviceJSONObject.toString());
+        Utils.debug("POST to " + MAYBE_SERVER_URL_LOG +" "+deviceJSONObject.toString());
         HttpURLConnection connection = null;
         JSONObject postResponseJSON = null;
         try {

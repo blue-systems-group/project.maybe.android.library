@@ -331,7 +331,7 @@ public class MaybeService {
     private static String MAYBE_SERVER_URL_DEVICE = "https://maybe.xcv58.me/maybe-api-v1/devices/";
     private static String SENDER_ID = "1068479230660";
     private static int label_count = 0;
-    private static final long MAX_SIZE = 2;
+    private static final long MAX_SIZE = 10;
 
     private MaybeService(Context context) {
         mContext = context;
