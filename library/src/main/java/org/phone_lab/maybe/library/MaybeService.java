@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -300,7 +299,6 @@ public class MaybeService {
                     logIntent.setAction("maybe.phone_lab.org.maybelibrary.action.LOG");
                     File file = new File(mContext.getFilesDir().getAbsolutePath()+"/"+localCache);
                     logIntent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));
-//                    logIntent.putExtra(localCache, Uri.fromFile(file));
                     Utils.debug("Log Intent Service invoked for file: " + file.toString() +
                             " Cache Dir ="+mContext.getFilesDir().getAbsolutePath()+ " Extra = " + Uri.fromFile(file));
                     mContext.startService(logIntent);
