@@ -34,9 +34,7 @@ public class LogIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Utils.debug("On Handle of LogIntent");
         mDeviceMEID = this.getDeviceMEID();
-        Utils.debug("Device ID on intent = "+mDeviceMEID);
         MAYBE_SERVER_URL_LOG = MAYBE_SERVER_URL_LOG+ mDeviceMEID+ "/testing_inputs.maybe";
         SharedPreferences prefs = getApplicationContext().getSharedPreferences("CacheFile", MODE_PRIVATE);
         Utils.debug("Shared prefs =" +prefs);
@@ -46,10 +44,8 @@ public class LogIntentService extends IntentService {
                 maybeService = MaybeService.getInstance(getApplicationContext());
                 String fileName =   prefs.getString("PreviousCache", null);
                 if (fileName!= null) {
-                    Utils.debug("Intent Service File Name : " + fileName);
                     Uri fileUri = (Uri)intent.getExtras().get(Intent.EXTRA_STREAM);
                     File localFile = new File(fileUri.getPath());
-                    Utils.debug("localFile path at intent = "+localFile.toString());
                     int sendCounter = 2;
                     JSONObject responseJSON;
                     try {
@@ -68,7 +64,6 @@ public class LogIntentService extends IntentService {
                         updatejsonObject.put("timestamp",timeElapsed);
                         updatejsonObject.put("label",label);
                         updatejsonObject.put("logObject",logJSONArray);
-                        Utils.debug("updatejsonObject = " + updatejsonObject.toString());
                         responseJSON = post(updatejsonObject);
                         int responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
                         while (sendCounter > 0 && responseCode != Constants.STATUS_CREATED) {
@@ -86,7 +81,6 @@ public class LogIntentService extends IntentService {
                         } else {
                             Utils.debug("Not deleted :" + localFile.toString());
                         }
-
                     } catch ( JSONException |IOException e) {
                         e.printStackTrace();
                     }
