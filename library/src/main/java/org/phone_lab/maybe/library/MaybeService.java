@@ -358,6 +358,7 @@ public class MaybeService {
         return mDeviceMEID;
     }
 
+    @SuppressWarnings("unchecked")
     private void initVariableMap() {
         if (this.variableMap == null) {
             try {
