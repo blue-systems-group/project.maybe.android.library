@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.google.gms.google-services'
 
+description = 'Maybe Android Library'
+
 android {
     compileSdkVersion 22
     buildToolsVersion '22.0.1'
