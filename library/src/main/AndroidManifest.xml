@@ -9,7 +9,8 @@
         android:theme="@style/AppTheme">
         <service
             android:name="org.phone_lab.maybe.library.QueryIntentService"
-            android:exported="false"></service>
+            android:exported="false">
+        </service>
 
         <receiver android:name="org.phone_lab.maybe.library.PullReceiver">
             <intent-filter android:priority="1">
@@ -20,7 +21,12 @@
         <!--[START log_intentserver] -->
         <service
             android:name="org.phone_lab.maybe.library.LogIntentService"
-            android:exported="false"></service>
+            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+            </intent-filter>
+        </service>
         <!--[END log_intentserver] -->
 
         <!-- [START gcm_receiver] -->
@@ -36,14 +42,14 @@
         <!-- [END gcm_receiver] -->
 
         <service
-            android:name=".MyGcmListenerService"
+            android:name="org.phone_lab.maybe.library.MyGcmListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
         <service
-            android:name=".MyInstanceIDListenerService"
+            android:name="org.phone_lab.maybe.library.MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />

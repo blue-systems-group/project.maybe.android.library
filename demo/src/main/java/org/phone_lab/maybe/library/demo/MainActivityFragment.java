@@ -7,8 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.PeriodicTask;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.phone_lab.maybe.library.GCMPeriodicLogUpdateService;
 import org.phone_lab.maybe.library.MaybeService;
 import org.phone_lab.maybe.library.QueryIntentService;
 import org.phone_lab.maybe.library.utils.Utils;
@@ -51,6 +55,22 @@ public class MainActivityFragment extends Fragment {
     }
 
     public void logMaybe() {
+
+//        long periodSecs = 30L; // the task should be executed every 30 seconds
+//        long flexSecs = 15L; //the task can run as early as -15 seconds from the scheduled time
+//        String tag = "PeriodicLogUpdate"; // a unique task identifier
+//        Utils.debug("Main Activity Context1 =" + getActivity().getApplicationContext());
+//        PeriodicTask periodic = new PeriodicTask.Builder()
+//                .setService(GCMPeriodicLogUpdateService.class)
+//                .setPeriod(periodSecs)
+//                .setFlex(flexSecs)
+//                .setTag(tag)
+//                .setPersisted(true)
+//                .setRequiredNetwork(com.google.android.gms.gcm.Task.NETWORK_STATE_CONNECTED)
+//                .setRequiresCharging(true)
+//                .build();
+//        GcmNetworkManager.getInstance(getActivity().getApplicationContext()).schedule(periodic);
+//        Utils.debug("Main Activity Context2 =" + getActivity().getApplicationContext());
         JSONObject logging = new JSONObject();
         try {
             logging.put("label","test");
