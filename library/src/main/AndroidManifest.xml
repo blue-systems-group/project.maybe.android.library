@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.phone_lab.maybe.library">
+    package="edu.buffalo.cse.maybe.android.library">
 
     <application
         android:allowBackup="true"
@@ -8,19 +8,19 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <service
-            android:name="org.phone_lab.maybe.library.QueryIntentService"
+            android:name="edu.buffalo.cse.maybe.android.library.QueryIntentService"
             android:exported="false">
         </service>
 
-        <receiver android:name="org.phone_lab.maybe.library.PullReceiver">
+        <receiver android:name="edu.buffalo.cse.maybe.android.library.PullReceiver">
             <intent-filter android:priority="1">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="maybe.phone_lab.org.maybe.library.pull_intent" />
+                <action android:name="edu.buffalo.cse.maybe.android.library.pull_intent" />
             </intent-filter>
         </receiver>
         <!--[START log_intentserver] -->
         <service
-            android:name="org.phone_lab.maybe.library.LogIntentService"
+            android:name="edu.buffalo.cse.maybe.android.library.LogIntentService"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
             android:exported="true">
             <intent-filter>
@@ -36,20 +36,20 @@
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="maybe.phone_lab.org.maybe.library" />
+                <category android:name="edu.buffalo.cse.maybe.android.library" />
             </intent-filter>
         </receiver>
         <!-- [END gcm_receiver] -->
 
         <service
-            android:name="org.phone_lab.maybe.library.MyGcmListenerService"
+            android:name="edu.buffalo.cse.maybe.android.library.MyGcmListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
         <service
-            android:name="org.phone_lab.maybe.library.MyInstanceIDListenerService"
+            android:name="edu.buffalo.cse.maybe.android.library.MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />

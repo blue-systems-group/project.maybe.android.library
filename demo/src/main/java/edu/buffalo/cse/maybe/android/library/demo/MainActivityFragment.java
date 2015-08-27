@@ -1,4 +1,4 @@
-package org.phone_lab.maybe.library.demo;
+package edu.buffalo.cse.maybe.android.library.demo;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,15 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.PeriodicTask;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.phone_lab.maybe.library.GCMPeriodicLogUpdateService;
-import org.phone_lab.maybe.library.MaybeService;
-import org.phone_lab.maybe.library.QueryIntentService;
-import org.phone_lab.maybe.library.utils.Utils;
+import edu.buffalo.cse.maybe.android.library.MaybeService;
+import edu.buffalo.cse.maybe.android.library.QueryIntentService;
+import edu.buffalo.cse.maybe.android.library.utils.Utils;
 
 /**
  * A placeholder fragment containing a simple view.

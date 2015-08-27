@@ -1,4 +1,4 @@
-package org.phone_lab.maybe.library;
+package edu.buffalo.cse.maybe.android.library;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,8 +16,8 @@ import com.google.android.gms.iid.InstanceID;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.phone_lab.maybe.library.utils.Constants;
-import org.phone_lab.maybe.library.utils.Utils;
+import edu.buffalo.cse.maybe.android.library.utils.Constants;
+import edu.buffalo.cse.maybe.android.library.utils.Utils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

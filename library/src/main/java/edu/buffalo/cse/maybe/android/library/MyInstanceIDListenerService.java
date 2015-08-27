@@ -1,8 +1,8 @@
-package org.phone_lab.maybe.library;
+package edu.buffalo.cse.maybe.android.library;
 
 import com.google.android.gms.iid.InstanceIDListenerService;
 
-import org.phone_lab.maybe.library.utils.Utils;
+import edu.buffalo.cse.maybe.android.library.utils.Utils;
 
 
 /**

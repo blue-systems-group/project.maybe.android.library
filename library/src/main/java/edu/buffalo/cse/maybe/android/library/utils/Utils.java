@@ -1,4 +1,4 @@
-package org.phone_lab.maybe.library.utils;
+package edu.buffalo.cse.maybe.android.library.utils;
 
 import android.util.Log;
 
