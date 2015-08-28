@@ -305,7 +305,7 @@ public class MaybeService {
                 Utils.debug("file_size now = " + file_size);
                 if(file_size >= MAX_SIZE) {
                     Intent logIntent = new Intent(mContext,LogIntentService.class);
-                    logIntent.setAction("maybe.phone_lab.org.maybelibrary.action.LOG");
+                    logIntent.setAction("edu.buffalo.cse.maybe.android.library.action.LOG");
                     File file = new File(mContext.getFilesDir().getAbsolutePath()+"/"+localCache);
                     logIntent.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(file));
                     mContext.startService(logIntent);

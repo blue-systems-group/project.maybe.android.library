@@ -6,7 +6,7 @@ android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
     defaultConfig {
-        applicationId 'org.phone_lab.maybe.library.demo'
+        applicationId 'edu.buffalo.cse.maybe.android.library.demo'
         minSdkVersion 19
         targetSdkVersion 22
         versionCode 1
@@ -21,7 +21,7 @@ android {
     productFlavors {
     }
     sourceSets {
-        main.java.srcDirs += 'src/main/java/org.phone_lab.maybe.library.demo/MainActivity'
+        main.java.srcDirs += 'src/main/java/edu.buffalo.cse.maybe.android.library.demo/MainActivity'
     }
 
     compileOptions {
@@ -37,7 +37,7 @@ repositories {
 }
 
 dependencies {
-//    compile(name: 'maybe', ext: 'aar')
+    //    compile(name: 'maybe', ext: 'aar')
     compile project(':library')
     compile 'com.google.android.gms:play-services:7.8.0'
     testCompile 'junit:junit:4.12'

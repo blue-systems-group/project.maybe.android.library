@@ -27,7 +27,7 @@ import java.net.URL;
  */
 public class LogIntentService extends IntentService {
 
-    private static final String ACTION_LOG = "maybe.phone_lab.org.maybelibrary.action.LOG";
+    private static final String ACTION_LOG = "edu.buffalo.cse.maybe.android.library.action.LOG";
     private MaybeService maybeService;
     private String mDeviceMEID;
     private static String MAYBE_SERVER_URL_LOG = "https://maybe.xcv58.me/maybe-api-v1/logs/";

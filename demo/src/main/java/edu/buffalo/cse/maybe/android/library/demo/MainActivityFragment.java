@@ -7,8 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.PeriodicTask;
+
+import edu.buffalo.cse.maybe.android.library.GCMPeriodicLogUpdateService;
 import edu.buffalo.cse.maybe.android.library.MaybeService;
 import edu.buffalo.cse.maybe.android.library.QueryIntentService;
 import edu.buffalo.cse.maybe.android.library.utils.Utils;
@@ -52,29 +54,29 @@ public class MainActivityFragment extends Fragment {
 
     public void logMaybe() {
 
-//        long periodSecs = 30L; // the task should be executed every 30 seconds
-//        long flexSecs = 15L; //the task can run as early as -15 seconds from the scheduled time
-//        String tag = "PeriodicLogUpdate"; // a unique task identifier
-//        Utils.debug("Main Activity Context1 =" + getActivity().getApplicationContext());
-//        PeriodicTask periodic = new PeriodicTask.Builder()
-//                .setService(GCMPeriodicLogUpdateService.class)
-//                .setPeriod(periodSecs)
-//                .setFlex(flexSecs)
-//                .setTag(tag)
-//                .setPersisted(true)
-//                .setRequiredNetwork(com.google.android.gms.gcm.Task.NETWORK_STATE_CONNECTED)
-//                .setRequiresCharging(true)
-//                .build();
-//        GcmNetworkManager.getInstance(getActivity().getApplicationContext()).schedule(periodic);
-//        Utils.debug("Main Activity Context2 =" + getActivity().getApplicationContext());
-        JSONObject logging = new JSONObject();
-        try {
-            logging.put("label","test");
-            logging.put("parameter2","testAgain");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        maybeService.log(logging);
+        long periodSecs = 30L; // the task should be executed every 30 seconds
+        long flexSecs = 15L; //the task can run as early as -15 seconds from the scheduled time
+        String tag = "PeriodicLogUpdate"; // a unique task identifier
+        Utils.debug("Main Activity Context1 =" + getActivity().getApplicationContext());
+        PeriodicTask periodic = new PeriodicTask.Builder()
+                .setService(GCMPeriodicLogUpdateService.class)
+                .setPeriod(periodSecs)
+                .setFlex(flexSecs)
+                .setTag(tag)
+                .setPersisted(true)
+                .setRequiredNetwork(com.google.android.gms.gcm.Task.NETWORK_STATE_CONNECTED)
+                .setRequiresCharging(true)
+                .build();
+        GcmNetworkManager.getInstance(getActivity().getApplicationContext()).schedule(periodic);
+        Utils.debug("Main Activity Context2 =" + getActivity().getApplicationContext());
+//        JSONObject logging = new JSONObject();
+//        try {
+//            logging.put("label","test");
+//            logging.put("parameter2","testAgain");
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        maybeService.log(logging);
     }
 
     private void testIntentService() {

@@ -26,7 +26,7 @@ public class MyGcmListenerService extends GcmListenerService {
      */
     private void sendNotification(String message) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-//                .setSmallIcon(R.drawable.common_signin_btn_icon_dark)
+                .setSmallIcon(R.drawable.common_signin_btn_icon_dark)
                 .setContentTitle("GCM Message")
                 .setContentText(message)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))

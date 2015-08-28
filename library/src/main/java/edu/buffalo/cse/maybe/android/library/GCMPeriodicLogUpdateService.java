@@ -7,6 +7,7 @@ import com.google.android.gms.gcm.TaskParams;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.buffalo.cse.maybe.android.library.MaybeService;
 import edu.buffalo.cse.maybe.android.library.utils.Utils;
 
 /**
@@ -19,14 +20,16 @@ public class GCMPeriodicLogUpdateService extends GcmTaskService{
     public int onRunTask(TaskParams taskParams) {
         maybeService = MaybeService.getInstance(getApplicationContext());
         Utils.debug("onRunTask : " + taskParams.getTag());
-        JSONObject logging = new JSONObject();
-        try {
-            logging.put("label","test");
-            logging.put("parameter2","testAgain");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        maybeService.log(logging);
+        //TODO:add logic to detect new log files
+        //TODO:invoke POST here
+//        JSONObject logging = new JSONObject();
+//        try {
+//            logging.put("label","test");
+//            logging.put("parameter2","testAgain");
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        maybeService.log(logging);
         return GcmNetworkManager.RESULT_SUCCESS;
     }
 }
