@@ -1,10 +1,10 @@
-package edu.buffalo.cse.maybe.android.library;
+package edu.buffalo.cse.android.maybelibrary;
 
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 
-import edu.buffalo.cse.maybe.android.library.utils.Utils;
+import edu.buffalo.cse.android.maybelibrary.utils.Utils;
 
 
 /**
@@ -17,12 +17,12 @@ import edu.buffalo.cse.maybe.android.library.utils.Utils;
 public class QueryIntentService extends IntentService {
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_FOO = "maybe.phone_lab.org.maybelibrary.action.FOO";
-    private static final String ACTION_BAZ = "maybe.phone_lab.org.maybelibrary.action.BAZ";
+    private static final String ACTION_FOO = "maybe.phone_lab.org.edu.buffalo.cse.android.edu.buffalo.cse.android.maybelibrary.action.FOO";
+    private static final String ACTION_BAZ = "maybe.phone_lab.org.edu.buffalo.cse.android.edu.buffalo.cse.android.maybelibrary.action.BAZ";
 
     // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "maybe.phone_lab.org.maybelibrary.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "maybe.phone_lab.org.maybelibrary.extra.PARAM2";
+    private static final String EXTRA_PARAM1 = "maybe.phone_lab.org.edu.buffalo.cse.android.edu.buffalo.cse.android.maybelibrary.extra.PARAM1";
+    private static final String EXTRA_PARAM2 = "maybe.phone_lab.org.edu.buffalo.cse.android.edu.buffalo.cse.android.maybelibrary.extra.PARAM2";
 
     /**
      * Starts this service to perform action Foo with the given parameters. If

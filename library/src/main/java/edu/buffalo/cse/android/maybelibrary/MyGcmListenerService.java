@@ -1,4 +1,4 @@
-package edu.buffalo.cse.maybe.android.library;
+package edu.buffalo.cse.android.maybelibrary;
 
 import android.app.NotificationManager;
 import android.media.RingtoneManager;
@@ -7,7 +7,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
-import edu.buffalo.cse.maybe.android.library.utils.Utils;
+import edu.buffalo.cse.android.maybelibrary.utils.Utils;
 
 /**
  * Created by xcv58 on 7/6/15.
@@ -26,7 +26,7 @@ public class MyGcmListenerService extends GcmListenerService {
      */
     private void sendNotification(String message) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.common_signin_btn_icon_dark)
+//                .setSmallIcon(R.drawable.common_signin_btn_icon_dark)
                 .setContentTitle("GCM Message")
                 .setContentText(message)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))

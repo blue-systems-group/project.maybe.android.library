@@ -1,4 +1,4 @@
-package edu.buffalo.cse.maybe.android.library;
+package edu.buffalo.cse.android.maybelibrary;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,14 +10,16 @@ import android.telephony.TelephonyManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.iid.InstanceID;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import edu.buffalo.cse.maybe.android.library.utils.Constants;
-import edu.buffalo.cse.maybe.android.library.utils.Utils;
+import edu.buffalo.cse.android.maybelibrary.utils.Constants;
+import edu.buffalo.cse.android.maybelibrary.utils.Utils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -299,6 +301,23 @@ public class MaybeService {
                 FileOutputStream fos = mContext.openFileOutput(localCache, Context.MODE_APPEND|Context.MODE_PRIVATE);
                 fos.write(toWriteLogString.getBytes());
                 fos.close();
+
+//                //initiate GCM services for post
+//                long periodSecs = 30L; // the task should be executed every 30 seconds
+//                long flexSecs = 15L; //the task can run as early as -15 seconds from the scheduled time
+//                String tag = "PeriodicLogUpdate"; // a unique task identifier
+//                Utils.debug("Main Activity Context1 =" + mContext.getApplicationContext());
+//                PeriodicTask periodic = new PeriodicTask.Builder()
+//                .setService(GCMPeriodicLogUpdateService.class)
+//                .setPeriod(periodSecs)
+//                .setFlex(flexSecs)
+//                .setTag(tag)
+//                .setPersisted(true)
+//                .setRequiredNetwork(com.google.android.gms.gcm.Task.NETWORK_STATE_CONNECTED)
+//                .setRequiresCharging(true)
+//                .build();
+//                GcmNetworkManager.getInstance(mContext.getApplicationContext()).schedule(periodic);
+//                Utils.debug("Main Activity Context2 =" + mContext.getApplicationContext());
 
                 //upload to server after max size limit is reached
                 float file_size = Integer.parseInt(String.valueOf(localCache.length()));

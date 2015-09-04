@@ -1,4 +1,4 @@
-package edu.buffalo.cse.maybe.android.library;
+package edu.buffalo.cse.android.maybelibrary;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -6,8 +6,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import edu.buffalo.cse.maybe.android.library.utils.Constants;
-import edu.buffalo.cse.maybe.android.library.utils.Utils;
+import edu.buffalo.cse.android.maybelibrary.utils.Constants;
+import edu.buffalo.cse.android.maybelibrary.utils.Utils;
 
 
 public class PullReceiver extends BroadcastReceiver {

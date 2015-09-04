@@ -1,4 +1,4 @@
-package edu.buffalo.cse.maybe.android.library.utils;
+package edu.buffalo.cse.android.maybelibrary.utils;
 
 /**
  * Created by xcv58 on 5/21/15.

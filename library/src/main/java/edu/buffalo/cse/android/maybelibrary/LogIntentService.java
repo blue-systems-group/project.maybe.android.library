@@ -1,4 +1,4 @@
-package edu.buffalo.cse.maybe.android.library;
+package edu.buffalo.cse.android.maybelibrary;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -10,8 +10,8 @@ import android.telephony.TelephonyManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import edu.buffalo.cse.maybe.android.library.utils.Constants;
-import edu.buffalo.cse.maybe.android.library.utils.Utils;
+import edu.buffalo.cse.android.maybelibrary.utils.Constants;
+import edu.buffalo.cse.android.maybelibrary.utils.Utils;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -64,6 +64,7 @@ public class LogIntentService extends IntentService {
                         updatejsonObject.put("timestamp",timeElapsed);
                         updatejsonObject.put("label",label);
                         updatejsonObject.put("logObject",logJSONArray);
+                        //GCM network manager logic goes here for post
                         responseJSON = post(updatejsonObject);
                         int responseCode = responseJSON.getInt(Constants.RESPONSE_CODE);
                         while (sendCounter > 0 && responseCode != Constants.STATUS_CREATED) {
