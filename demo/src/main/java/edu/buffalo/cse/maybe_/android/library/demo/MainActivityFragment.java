@@ -25,6 +25,11 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        maybe ("123") {
+            Utils.debug("Test 1");
+        } or {
+            Utils.debug("Test 2");
+        }
         maybeService = MaybeService.getInstance(getActivity().getApplicationContext());
         this.testMaybeVariable();
         this.logMaybe();

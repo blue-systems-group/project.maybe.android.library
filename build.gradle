@@ -25,5 +25,80 @@ allprojects {
         tasks.withType(JavaCompile) {
             options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
         }
+        def javaCompileTasks = tasks.withType(JavaCompile).collect()
+        javaCompileTasks.each {
+            task ->
+            task.doFirst {
+                println 'doFirst'
+                classpath.each {
+                    path -> println path
+                }
+                println source
+            }
+            def newTaskName = task.name + 'Maybe'
+            // newTaskName = task.name
+            println 'generate new task: ' + newTaskName
+            println task.includes
+            println task.excludes
+            def options = task.getOptions()
+            def destinationDir = task.destinationDir
+            def tempDir = new File(destinationDir.toString() + 'maybe')
+            tasks.create(name: newTaskName, type: JavaExec) {
+                // setup input and output to take advantage of UP-TO-DATE
+                inputs.file task.source
+                outputs.dir tempDir
+
+                doFirst {
+                    println 'MaybeJavaC'
+                    def arguments = ['-g', '-c', '-D', tempDir]
+                    arguments.addAll(['-noserial', '-postcompiler', 'javac'])
+
+                    if (options.bootClasspath != null) {
+                        arguments.addAll(['-bootclasspath', options.bootClasspath])
+                    }
+                    // TODO: polyglot doesn't support -Xlint
+                    // arguments.addAll(options.compilerArgs)
+
+                    // if (options.encoding != null) {
+                    //     // TODO: polyglot doesn't support -encoding
+                    //     arguments.addAll(['-encoding', options.encoding])
+                    // }
+
+                    println 'source start'
+                    task.source.each {
+                        file -> arguments.add(file)
+                        println file
+                    }
+                    println 'source end'
+                    // task.source = fileTree(dir: tempDir)
+
+                    task.classpath.each {
+                        path -> arguments.addAll(['-classpath', path])
+                        println path
+                    }
+
+                    args arguments
+                }
+
+                // TODO: use maven to get maybe libs
+                classpath fileTree(dir: 'libs-maybe', include: '*.jar')
+
+                main = 'edu.buffalo.cse.blue.maybe.Main'
+
+                // enabled = task.enabled
+
+                dependsOn task.dependsOn.collect()
+
+                // task.dependsOn.each {
+                //     println it
+                // }
+                // println commandLine
+            }
+            task.dependsOn { newTaskName }
+            task.doFirst {
+                task.source = fileTree(dir: task.destinationDir.toString() + 'maybe')
+            }
+            // task.enabled = false
+        }
     }
 }
