@@ -1,4 +1,4 @@
-package edu.buffalo.cse.maybe.android.library.demo;
+package edu.buffalo.cse.android.maybelibrary;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,9 +10,8 @@ import android.view.ViewGroup;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.buffalo.cse.android.maybelibrary.MaybeService;
-import edu.buffalo.cse.android.maybelibrary.QueryIntentService;
 import edu.buffalo.cse.android.maybelibrary.utils.Utils;
+import edu.buffalo.cse.android.maybelibrary.demo.R;
 
 /**
  * A placeholder fragment containing a simple view.

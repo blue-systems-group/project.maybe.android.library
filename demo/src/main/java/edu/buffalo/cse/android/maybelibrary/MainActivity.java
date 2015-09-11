@@ -1,11 +1,11 @@
-package edu.buffalo.cse.maybe.android.library.demo;
+package edu.buffalo.cse.android.maybelibrary;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import edu.buffalo.cse.maybe.android.library.demo.R;
+import edu.buffalo.cse.android.maybelibrary.demo.R;
 
 public class MainActivity extends AppCompatActivity {
 
