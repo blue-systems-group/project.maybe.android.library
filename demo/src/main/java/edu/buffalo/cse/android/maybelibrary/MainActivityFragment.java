@@ -1,6 +1,5 @@
 package edu.buffalo.cse.android.maybelibrary;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,8 +9,8 @@ import android.view.ViewGroup;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.buffalo.cse.android.maybelibrary.utils.Utils;
 import edu.buffalo.cse.android.maybelibrary.demo.R;
+import edu.buffalo.cse.android.maybelibrary.utils.Utils;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -27,7 +26,6 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         maybeService = MaybeService.getInstance(getActivity().getApplicationContext());
-//        this.testIntentService();
         this.testMaybeVariable();
         this.logMaybe();
         return inflater.inflate(R.layout.fragment_main, container, false);
@@ -75,13 +73,5 @@ public class MainActivityFragment extends Fragment {
             e.printStackTrace();
         }
         maybeService.log(logging);
-    }
-
-    private void testIntentService() {
-        Intent intent = new Intent(getActivity(), QueryIntentService.class);
-        intent.setAction("maybe.phone_lab.org.edu.buffalo.cse.android.edu.buffalo.cse.android.maybelibrary.action.FOO");
-        intent.putExtra("maybe.phone_lab.org.edu.buffalo.cse.android.edu.buffalo.cse.android.maybelibrary.extra.PARAM1", "1");
-        intent.putExtra("maybe.phone_lab.org.edu.buffalo.cse.android.edu.buffalo.cse.android.maybelibrary.extra.PARAM2", "2");
-        getActivity().startService(intent);
     }
 }
