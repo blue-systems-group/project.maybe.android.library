@@ -1,11 +1,11 @@
-package edu.buffalo.cse.android.maybelibrary.utils;
+package edu.buffalo.cse.maybe_.android.library.utils;
 
 /**
  * Created by xcv58 on 5/21/15.
  */
 public class Constants {
     public static final long PULL_INTERVAL = 1000L * 60L;
-    public static final String PULL_INTENT = "edu.buffalo.cse.android.maybelibrary.pull_intent";
+    public static final String PULL_INTENT = "edu.buffalo.cse.maybe_.android.library.pull_intent";
 
     public static final String SENDER_ID = "1068479230660";
 

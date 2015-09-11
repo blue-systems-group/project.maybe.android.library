@@ -1,8 +1,8 @@
-package edu.buffalo.cse.android.maybelibrary;
+package edu.buffalo.cse.maybe_.android.library;
 
 import com.google.android.gms.iid.InstanceIDListenerService;
 
-import edu.buffalo.cse.android.maybelibrary.utils.Utils;
+import edu.buffalo.cse.maybe_.android.library.utils.Utils;
 
 
 /**

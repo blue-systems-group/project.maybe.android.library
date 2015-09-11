@@ -1,10 +1,10 @@
-package edu.buffalo.cse.android.maybelibrary;
+package edu.buffalo.cse.maybe_.android.library;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
 
-import edu.buffalo.cse.android.maybelibrary.utils.Utils;
+import edu.buffalo.cse.maybe_.android.library.utils.Utils;
 
 /**
  * Created by ramyarao on 8/25/15.

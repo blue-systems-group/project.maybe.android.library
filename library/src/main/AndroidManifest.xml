@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="edu.buffalo.cse.android.maybelibrary">
+    package="edu.buffalo.cse.android.maybe_.android.library">
 
     <application
         android:allowBackup="true"
@@ -8,15 +8,15 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <receiver android:name="edu.buffalo.cse.android.maybelibrary.PullReceiver">
+        <receiver android:name="edu.buffalo.cse.maybe_.android.library.PullReceiver">
             <intent-filter android:priority="1">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="edu.buffalo.cse.android.maybelibrary.pull_intent" />
+                <action android:name="edu.buffalo.cse.maybe_.android.library.pull_intent" />
             </intent-filter>
         </receiver>
         <!--[START log_intentserver] -->
         <service
-            android:name="edu.buffalo.cse.android.maybelibrary.LogIntentService"
+            android:name="edu.buffalo.cse.maybe_.android.library.LogIntentService"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
             android:exported="true">
             <intent-filter>
@@ -32,20 +32,20 @@
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="edu.buffalo.cse.android.maybelibrary" />
+                <category android:name="edu.buffalo.cse.maybe_.android.library" />
             </intent-filter>
         </receiver>
         <!-- [END gcm_receiver] -->
 
         <service
-            android:name="edu.buffalo.cse.android.maybelibrary.MyGcmListenerService"
+            android:name="edu.buffalo.cse.maybe_.android.library.MyGcmListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
         <service
-            android:name="edu.buffalo.cse.android.maybelibrary.MyInstanceIDListenerService"
+            android:name="edu.buffalo.cse.maybe_.android.library.MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID" />

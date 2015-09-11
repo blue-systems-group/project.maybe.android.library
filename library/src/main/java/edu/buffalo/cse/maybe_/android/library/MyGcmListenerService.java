@@ -1,4 +1,4 @@
-package edu.buffalo.cse.android.maybelibrary;
+package edu.buffalo.cse.maybe_.android.library;
 
 import android.app.NotificationManager;
 import android.media.RingtoneManager;
@@ -7,7 +7,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
-import edu.buffalo.cse.android.maybelibrary.utils.Utils;
+import edu.buffalo.cse.maybe_.android.library.utils.Utils;
 
 /**
  * Created by xcv58 on 7/6/15.

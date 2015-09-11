@@ -1,4 +1,4 @@
-package edu.buffalo.cse.android.maybelibrary;
+package edu.buffalo.cse.maybe_.android.library;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,16 +10,14 @@ import android.telephony.TelephonyManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.iid.InstanceID;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import edu.buffalo.cse.android.maybelibrary.utils.Constants;
-import edu.buffalo.cse.android.maybelibrary.utils.Utils;
+import edu.buffalo.cse.maybe_.android.library.utils.Constants;
+import edu.buffalo.cse.maybe_.android.library.utils.Utils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

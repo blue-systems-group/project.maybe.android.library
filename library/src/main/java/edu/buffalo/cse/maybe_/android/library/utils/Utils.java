@@ -1,4 +1,4 @@
-package edu.buffalo.cse.android.maybelibrary.utils;
+package edu.buffalo.cse.maybe_.android.library.utils;
 
 import android.util.Log;
 

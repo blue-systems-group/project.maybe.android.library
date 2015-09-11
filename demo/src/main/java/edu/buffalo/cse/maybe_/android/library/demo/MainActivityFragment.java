@@ -1,4 +1,4 @@
-package edu.buffalo.cse.android.maybelibrary;
+package edu.buffalo.cse.maybe_.android.library.demo;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.buffalo.cse.android.maybelibrary.demo.R;
-import edu.buffalo.cse.android.maybelibrary.utils.Utils;
+import edu.buffalo.cse.maybe_.android.library.MaybeService;
+import edu.buffalo.cse.maybe_.android.library.utils.Utils;
 
 /**
  * A placeholder fragment containing a simple view.

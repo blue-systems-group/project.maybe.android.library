@@ -1,4 +1,4 @@
-package edu.buffalo.cse.android.maybelibrary;
+package edu.buffalo.cse.maybe_.android.library;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -10,8 +10,6 @@ import android.telephony.TelephonyManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import edu.buffalo.cse.android.maybelibrary.utils.Constants;
-import edu.buffalo.cse.android.maybelibrary.utils.Utils;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -21,6 +19,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import edu.buffalo.cse.maybe_.android.library.utils.Constants;
+import edu.buffalo.cse.maybe_.android.library.utils.Utils;
 
 /*
  * Created by ramyarao on 7/13/15.
