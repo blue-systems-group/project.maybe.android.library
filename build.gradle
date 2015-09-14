@@ -25,56 +25,5 @@ allprojects {
         tasks.withType(JavaCompile) {
             options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
         }
-        def javaCompileTasks = tasks.withType(JavaCompile).collect()
-        javaCompileTasks.each {
-            task ->
-            def newTaskName = task.name + 'Maybe'
-            def options = task.getOptions()
-            def destinationDir = task.destinationDir
-            def tempDir = new File(destinationDir.toString() + 'maybe')
-            tasks.create(name: newTaskName, type: JavaExec) {
-                // setup input and output to take advantage of UP-TO-DATE
-                inputs.file task.source
-                outputs.dir tempDir
-
-                doFirst {
-                    def arguments = ['-g', '-c', '-D', tempDir]
-                    arguments.addAll(['-noserial', '-postcompiler', 'javac'])
-
-                    if (options.bootClasspath != null) {
-                        arguments.addAll(['-bootclasspath', options.bootClasspath])
-                    }
-                    // TODO: polyglot doesn't support -Xlint
-                    // arguments.addAll(options.compilerArgs)
-
-                    // if (options.encoding != null) {
-                    //     // TODO: polyglot doesn't support -encoding
-                    //     arguments.addAll(['-encoding', options.encoding])
-                    // }
-
-                    task.source.each {
-                        file -> arguments.add(file)
-                    }
-
-                    task.classpath.each {
-                        path -> arguments.addAll(['-classpath', path])
-                    }
-
-                    args arguments
-                }
-
-                // TODO: use maven to get maybe libs
-                classpath fileTree(dir: 'libs-maybe', include: '*.jar')
-
-                main = 'edu.buffalo.cse.blue.maybe.Main'
-
-                dependsOn task.dependsOn.collect()
-
-            }
-            task.dependsOn { newTaskName }
-            task.doFirst {
-                task.source = fileTree(dir: task.destinationDir.toString() + 'maybe')
-            }
-        }
     }
 }
