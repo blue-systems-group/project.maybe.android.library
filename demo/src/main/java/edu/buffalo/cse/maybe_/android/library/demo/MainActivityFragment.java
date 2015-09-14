@@ -30,6 +30,7 @@ public class MainActivityFragment extends Fragment {
         } or {
             Utils.debug("Test 2");
         }
+        int a = maybe ("test") {1, 2, 3, 4};
         maybeService = MaybeService.getInstance(getActivity().getApplicationContext());
         this.testMaybeVariable();
         this.logMaybe();
