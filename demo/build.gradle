@@ -43,6 +43,14 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+def manifestPackage() {
+    // TODO: use actual package name in build process instead of parse AndroidManifest.xml manually
+    def manifestFile = file(project.projectDir.absolutePath + '/src/main/AndroidManifest.xml')
+    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+    def xml = new XmlParser().parse(manifestFile)
+    return xml.attributes().package
+}
+
 afterEvaluate {
     def javaCompileTasks = tasks.withType(JavaCompile).collect()
     javaCompileTasks.each {
@@ -57,8 +65,10 @@ afterEvaluate {
                 outputs.dir tempDir
 
                 doFirst {
-                    def arguments = ['-g', '-c', '-D', tempDir]
+                    def arguments = args
+                    arguments.addAll(['-g', '-c', '-D', tempDir])
                     arguments.addAll(['-noserial', '-postcompiler', 'javac'])
+                    arguments.addAll(['-package', manifestPackage()])
 
                     if (options.bootClasspath != null) {
                         arguments.addAll(['-bootclasspath', options.bootClasspath])
