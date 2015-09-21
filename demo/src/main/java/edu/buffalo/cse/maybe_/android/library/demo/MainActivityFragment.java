@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,10 +26,24 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Utils.debug("Test s");
+        maybe("123") {
+            Utils.debug("Test 1");
+        } or {
+            Utils.debug("Test 2");
+        }
+        int a = maybe ("test") {1, 2, 3, 4};
         maybeService = MaybeService.getInstance(getActivity().getApplicationContext());
         this.testMaybeVariable();
         this.logMaybe();
         return inflater.inflate(R.layout.fragment_main, container, false);
+    }
+
+    public void onResume() {
+        super.onResume();
+        TextView textView = (TextView) getActivity().findViewById(R.id.hello_world);
+        String maybeText = maybe("String") {"Maybe String 1", "Maybe String 2"};
+        textView.setText(maybeText);
     }
 
     public void testMaybeVariable() {
