@@ -37,8 +37,10 @@ import edu.buffalo.cse.maybe_.android.library.rest.MaybeRESTService;
 import edu.buffalo.cse.maybe_.android.library.rest.ServiceFactory;
 import edu.buffalo.cse.maybe_.android.library.utils.Constants;
 import edu.buffalo.cse.maybe_.android.library.utils.Utils;
+import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 /*
@@ -374,8 +376,9 @@ public class MaybeService {
     public void init() {
         MaybeRESTService maybeRESTService = ServiceFactory.createRetrofitService(MaybeRESTService.class, Constants.BASE_URL);
         Utils.debug("deviceid: " + mDeviceMEID);
-        maybeRESTService.getDevice(mDeviceMEID)
-                .subscribeOn(Schedulers.newThread())
+        Observable<List<Device>> get = maybeRESTService.getDevice(mDeviceMEID);
+        Observable<List<Device>> get2 = maybeRESTService.getDevice("001");
+        get.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Device>>() {
                     @Override
@@ -400,6 +403,57 @@ public class MaybeService {
                         }
                     }
                 });
+        Device device = new Device();
+        device.deviceid = "001";
+        get2.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Device>>() {
+                    @Override
+                    public void onCompleted() {
+                        Utils.debug("onCompleted");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Utils.debug("onError: " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(List<Device> devices) {
+                        int size = devices.size();
+                        if (size == 0) {
+                            // TOOD: not register on backend
+                            Utils.debug("not register on backend!");
+                        } else {
+                            Device device = devices.get(0);
+                            Utils.debug("device: " + new Gson().toJson(device));
+                        }
+                    }
+                });
+        Observable.zip(get, get2, new Func2<List<Device>, List<Device>, String>() {
+            @Override
+            public String call(List<Device> l1, List<Device> l2) {
+                Utils.debug("zip");
+                return l1.get(0).deviceid + " " + l2.get(0).deviceid;
+            }
+        }).subscribe(new Subscriber<String>() {
+            @Override
+            public void onCompleted() {
+                Utils.debug("zip complete");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Utils.debug("onError: " + e.getMessage());
+            }
+
+            @Override
+            public void onNext(String s) {
+                Utils.debug("zip string: " + s);
+            }
+        });
+
+        Utils.debug("device: " + new Gson().toJson(device));
     }
 
     private void setPackageName() {
