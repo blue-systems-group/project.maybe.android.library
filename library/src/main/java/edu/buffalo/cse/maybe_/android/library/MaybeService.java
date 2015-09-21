@@ -12,12 +12,11 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import edu.buffalo.cse.maybe_.android.library.utils.Constants;
-import edu.buffalo.cse.maybe_.android.library.utils.Utils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -31,6 +30,17 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+
+import edu.buffalo.cse.maybe_.android.library.rest.Device;
+import edu.buffalo.cse.maybe_.android.library.rest.MaybeRESTService;
+import edu.buffalo.cse.maybe_.android.library.rest.ServiceFactory;
+import edu.buffalo.cse.maybe_.android.library.utils.Constants;
+import edu.buffalo.cse.maybe_.android.library.utils.Utils;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 /*
  * Created by xcv58 on 5/8/15.
  */
@@ -352,7 +362,8 @@ public class MaybeService {
         this.initVariableMap();
         // TODO: connect to Google Cloud Messaging ASYNC
         // TODO: then connect to server ASYNC
-        this.asyncTasks();
+        this.init();
+//        this.asyncTasks();
     }
 
     protected void asyncTasks() {
@@ -360,9 +371,41 @@ public class MaybeService {
         thread.start();
     }
 
+    public void init() {
+        MaybeRESTService maybeRESTService = ServiceFactory.createRetrofitService(MaybeRESTService.class, Constants.BASE_URL);
+        Utils.debug("deviceid: " + mDeviceMEID);
+        maybeRESTService.getDevice(mDeviceMEID)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Device>>() {
+                    @Override
+                    public void onCompleted() {
+                        Utils.debug("onCompleted");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Utils.debug("onError: " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(List<Device> devices) {
+                        int size = devices.size();
+                        if (size == 0) {
+                            // TOOD: not register on backend
+                            Utils.debug("not register on backend!");
+                        } else {
+                            Device device = devices.get(0);
+                            Utils.debug("device: " + new Gson().toJson(device));
+                        }
+                    }
+                });
+    }
+
     private void setPackageName() {
         this.packageName = "testing_inputs.maybe";
         this.packageName = mContext.getPackageName();
+        Utils.debug("Real package name: " + this.packageName);
     }
 
     private String getDeviceMEID() {

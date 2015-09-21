@@ -7,6 +7,8 @@ public class Constants {
     public static final long PULL_INTERVAL = 1000L * 60L;
     public static final String PULL_INTENT = "edu.buffalo.cse.maybe_.android.library.pull_intent";
 
+    public static String BASE_URL = "http://maybe.xcv58.me/maybe-api-v1/";
+
     public static final String SENDER_ID = "1068479230660";
 
     public static final String TAG = "Maybe_Library";
