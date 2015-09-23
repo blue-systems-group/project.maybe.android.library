@@ -392,6 +392,7 @@ public class MaybeService {
             Utils.debug("mDevice.choices.labelJSON.label is null: " + new Gson().toJson(mDevice));
             return 0;
         }
+        Utils.debug("get(" + label + ") = " + choice.choice);
         return choice.choice;
     }
 

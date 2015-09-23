@@ -1,5 +1,6 @@
 package edu.buffalo.cse.maybe_.android.library.demo;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -26,14 +27,14 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Utils.debug("Test s");
+        maybeService = MaybeService.getInstance(getActivity().getApplicationContext());
         maybe("123") {
             Utils.debug("Test 1");
         } or {
             Utils.debug("Test 2");
         }
         int a = maybe ("test") {1, 2, 3, 4};
-        maybeService = MaybeService.getInstance(getActivity().getApplicationContext());
+        Utils.debug("a = " + a);
         this.testMaybeVariable();
         this.logMaybe();
         return inflater.inflate(R.layout.fragment_main, container, false);
@@ -44,6 +45,15 @@ public class MainActivityFragment extends Fragment {
         TextView textView = (TextView) getActivity().findViewById(R.id.hello_world);
         String maybeText = maybe("String") {"Maybe String 1", "Maybe String 2"};
         textView.setText(maybeText);
+        maybe("color") {
+            textView.setBackgroundColor(Color.RED);
+        } or {
+            textView.setBackgroundColor(Color.YELLOW);
+        } or {
+            textView.setBackgroundColor(Color.GREEN);
+        } or {
+            textView.setBackgroundColor(Color.WHITE);
+        }
     }
 
     public void testMaybeVariable() {
