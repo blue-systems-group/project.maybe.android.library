@@ -1,4 +1,4 @@
-package edu.buffalo.cse.maybe_.android.library;
+package edu.buffalo.cse.maybe_.android.library.receivers;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import edu.buffalo.cse.maybe_.android.library.MaybeService;
 import edu.buffalo.cse.maybe_.android.library.utils.Constants;
 import edu.buffalo.cse.maybe_.android.library.utils.Utils;
 
@@ -25,7 +26,6 @@ public class PullReceiver extends BroadcastReceiver {
             Utils.debug("receive BOOT UP intent");
             Intent pullIntent = new Intent(Constants.PULL_INTENT);
             setRepeatAlarm(context, pullIntent);
-
         } else if (intentAction.equalsIgnoreCase(Constants.PULL_INTENT)) {
             Utils.debug("receive pull intent");
             this.pull(context);
@@ -38,7 +38,7 @@ public class PullReceiver extends BroadcastReceiver {
         if (maybeService == null) {
             maybeService = MaybeService.getInstance(context);
         } else {
-            maybeService.asyncTasks();
+            maybeService.init();
         }
     }
 

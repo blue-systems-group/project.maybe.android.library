@@ -44,11 +44,13 @@ dependencies {
 }
 
 def manifestPackage() {
-    // TODO: use actual package name in build process instead of parse AndroidManifest.xml manually
-    def manifestFile = file(project.projectDir.absolutePath + '/src/main/AndroidManifest.xml')
-    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
-    def xml = new XmlParser().parse(manifestFile)
-    return xml.attributes().package
+//     TODO: use actual package name in build process instead of parse AndroidManifest.xml manually
+//    def manifestFile = file(project.projectDir.absolutePath + '/src/main/AndroidManifest.xml')
+//    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+//    def xml = new XmlParser().parse(manifestFile)
+//    return xml.attributes().package
+//    TODO: is there a better way for both application and library? Now it works only for application
+    return android.defaultConfig.applicationId
 }
 
 afterEvaluate {

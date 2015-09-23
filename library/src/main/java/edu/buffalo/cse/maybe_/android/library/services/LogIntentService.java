@@ -1,4 +1,4 @@
-package edu.buffalo.cse.maybe_.android.library;
+package edu.buffalo.cse.maybe_.android.library.services;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -20,6 +20,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import edu.buffalo.cse.maybe_.android.library.MaybeService;
 import edu.buffalo.cse.maybe_.android.library.utils.Constants;
 import edu.buffalo.cse.maybe_.android.library.utils.Utils;
 

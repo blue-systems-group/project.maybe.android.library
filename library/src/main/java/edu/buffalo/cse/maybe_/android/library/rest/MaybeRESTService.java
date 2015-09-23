@@ -2,7 +2,10 @@ package edu.buffalo.cse.maybe_.android.library.rest;
 
 import java.util.List;
 
+import retrofit.http.Body;
 import retrofit.http.GET;
+import retrofit.http.POST;
+import retrofit.http.PUT;
 import retrofit.http.Path;
 import rx.Observable;
 
@@ -12,4 +15,10 @@ import rx.Observable;
 public interface MaybeRESTService {
     @GET("devices/{deviceID}")
     Observable<List<Device>> getDevice(@Path("deviceID") String deviceID);
+
+    @PUT("devices/{deviceID}")
+    Observable<Device> putDevice(@Path("deviceID") String deviceID, @Body Device device);
+
+    @POST("devices/")
+    Observable<Device> postDevice(@Body Device device);
 }

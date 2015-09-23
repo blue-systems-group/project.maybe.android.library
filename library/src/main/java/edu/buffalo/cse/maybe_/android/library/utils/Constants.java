@@ -14,6 +14,8 @@ public class Constants {
     public static final String TAG = "Maybe_Library";
 
     public static final String MAP_FILE = "MAP_FILE";
+    public static final String SHARED_PREFERENCE_NAME = "SHARED_PREFERENCE_NAME";
+    public static final String SHARED_PREFERENCE_KEY = "SHARED_PREFERENCE_KEY";
 
     public static final String NO_REGISTRATION_ID = "";
 
@@ -39,14 +41,5 @@ public class Constants {
     public static final String LABEL_JSON = "labelJSON";
     public static final String CHOICE = "choice";
 
-    public static final int STATUS_OK = 200;
     public static final int STATUS_CREATED = 201;
-    public static final int STATUS_ACCEPTED = 202;
-    public static final int STATUS_NO_CONTENT = 204;
-    public static final int STATUS_RESET_CONTENT = 205;
-    public static final int STATUS_PARTIAL_CONTENT = 206;
-    public static final int STATUS_BAD_REQUEST = 400;
-    public static final int STATUS_UNAUTHORIZED = 401;
-    public static final int STATUS_FORBIDDEN = 403;
-    public static final int STATUS_NOT_FOUND = 404;
 }

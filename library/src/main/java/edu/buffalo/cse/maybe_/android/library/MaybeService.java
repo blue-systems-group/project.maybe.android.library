@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.telephony.TelephonyManager;
@@ -14,33 +16,25 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.google.gson.Gson;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
+import edu.buffalo.cse.maybe_.android.library.rest.Choice;
 import edu.buffalo.cse.maybe_.android.library.rest.Device;
 import edu.buffalo.cse.maybe_.android.library.rest.MaybeRESTService;
+import edu.buffalo.cse.maybe_.android.library.rest.PackageChoices;
 import edu.buffalo.cse.maybe_.android.library.rest.ServiceFactory;
+import edu.buffalo.cse.maybe_.android.library.services.LogIntentService;
 import edu.buffalo.cse.maybe_.android.library.utils.Constants;
 import edu.buffalo.cse.maybe_.android.library.utils.Utils;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 /*
@@ -49,229 +43,33 @@ import rx.schedulers.Schedulers;
 public class MaybeService {
 
     private volatile static MaybeService maybeService;
+
     private Context mContext;
+
     private String mDeviceMEID;
     private String packageName;
-    private HashMap<String, Integer> variableMap;
+
+    private Device mDevice;
 
     private static String registrationId = Constants.NO_REGISTRATION_ID;
+
     // TODO: add set method for url and sender id
-    private static String MAYBE_SERVER_URL_DEVICE = "https://maybe.xcv58.me/maybe-api-v1/devices/";
     private static String SENDER_ID = "1068479230660";
     private static int label_count = 0;
     private static final long MAX_SIZE = 10;
+
     public static MaybeService getInstance(Context context) {
         if (maybeService == null) {
             Utils.debug("maybeService is null, init it!");
             synchronized (MaybeService.class) {
-                maybeService = new MaybeService(context);
+                // Using the context-application instead of a context-activity to avoid memory leak
+                // http://android-developers.blogspot.co.il/2009/01/avoiding-memory-leaks.html
+                maybeService = new MaybeService(context.getApplicationContext());
             }
         } else {
             Utils.debug("maybeService is not null, just return!");
         }
         return maybeService;
-    }
-
-    private class AsyncTask implements Runnable {
-
-        @Override
-        public void run() {
-            // TODO: handle no internet, basically try to re-run below codes after fixed time.
-            String processName = mContext.getApplicationInfo().processName;
-            Utils.debug(processName);
-            this.GCM();
-            this.maybeServer();
-        }
-
-        private void maybeServer() {
-            if (Constants.NO_REGISTRATION_ID == registrationId) {
-                // TODO: connect with server with registrationId
-            } else {
-                // TODO: connect with server with NO registrationId
-            }
-
-            // TODO: Try GET, if not found (404) or , then POST with deviceID and registrationId (if have)
-            // TODO: if something stale, then PUT to update
-            JSONObject getResponseJSON = this.get();
-            try {
-                JSONObject deviceJSON = this.getDeviceJSON();
-                int responseCode = getResponseJSON.getInt(Constants.RESPONSE_CODE);
-                if (responseCode == Constants.STATUS_OK) {
-                    // TODO: finish or put
-                    JSONObject deviceChoicesJSONObject = (new JSONArray(getResponseJSON.getString(Constants.RESPONSE_CONTENT))).getJSONObject(0);
-                    this.jsonToHashMap(deviceChoicesJSONObject);
-                    if (!registrationId.equals(deviceChoicesJSONObject.getString(Constants.GCM_ID))) {
-                        this.put(deviceJSON);
-                    }
-                    // server only return array
-                } else if (responseCode == Constants.STATUS_NOT_FOUND) {
-                    // TODO: post, if failed set timer to retry else just update
-                    JSONObject postResponseJSONObject = this.post(deviceJSON);
-                    responseCode = postResponseJSONObject.getInt(Constants.RESPONSE_CODE);
-                    if (responseCode == Constants.STATUS_CREATED) {
-                        JSONObject deviceChoicesJSONObject = new JSONObject(postResponseJSONObject.getString(Constants.RESPONSE_CONTENT));
-                        this.jsonToHashMap(deviceChoicesJSONObject);
-                    } else {
-                        Utils.debug("POST failed: " + postResponseJSONObject.toString());
-                    }
-                } else {
-                    Utils.debug(responseCode + " haven't supported yet!");
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        private JSONObject getDeviceJSON() throws JSONException {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put(Constants.DEVICE_ID, mDeviceMEID);
-            jsonObject.put(Constants.GCM_ID, registrationId);
-//            if (!registrationId.equals(Constants.NO_REGISTRATION_ID)) {
-//                jsonObject.put(Constants.GCM_ID, registrationId);
-//            }
-            return jsonObject;
-        }
-
-        private JSONObject get() {
-            JSONObject getResponseJSON = null;
-            HttpURLConnection connection = null;
-            try {
-                URL url = new URL(MAYBE_SERVER_URL_DEVICE + mDeviceMEID);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-
-                getResponseJSON = Utils.getResponseJSONObject(connection);
-                Utils.debug("GET response: " + getResponseJSON.toString());
-            } catch (Exception e) {
-                Utils.debug(e);
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-            }
-            return getResponseJSON;
-        }
-
-        private JSONObject post(JSONObject deviceJSONObject) {
-            Utils.debug("POST to " + MAYBE_SERVER_URL_DEVICE + " -d " + deviceJSONObject.toString());
-            HttpURLConnection connection = null;
-            JSONObject postResponseJSON = null;
-            try {
-                URL url = new URL(MAYBE_SERVER_URL_DEVICE);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
-
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("Accept", "application/json");
-
-                connection.setDoOutput(true);
-                connection.setChunkedStreamingMode(0);
-
-                OutputStreamWriter writer = new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
-                writer.write(deviceJSONObject.toString());
-                writer.close();
-
-                postResponseJSON = Utils.getResponseJSONObject(connection);
-                Utils.debug("POST response: " + postResponseJSON.toString());
-            } catch (Exception e) {
-                Utils.debug(e);
-            } finally {
-                if (connection != null) {
-
-                    connection.disconnect();
-                }
-            }
-            return postResponseJSON;
-        }
-
-        private void put(JSONObject deviceJSONObject) {
-            Utils.debug("PUT to " + MAYBE_SERVER_URL_DEVICE + mDeviceMEID + " -d " + deviceJSONObject.toString());
-            HttpURLConnection connection = null;
-            JSONObject putResponseJSON = null;
-            try {
-                URL url = new URL(MAYBE_SERVER_URL_DEVICE + mDeviceMEID);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("PUT");
-
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("Accept", "application/json");
-
-                connection.setDoOutput(true);
-                connection.setChunkedStreamingMode(0);
-
-                OutputStreamWriter writer = new OutputStreamWriter(new BufferedOutputStream(connection.getOutputStream()));
-                writer.write(deviceJSONObject.toString());
-                writer.close();
-
-                putResponseJSON = Utils.getResponseJSONObject(connection);
-                Utils.debug("PUT response: " + putResponseJSON.toString());
-            } catch (Exception e) {
-                Utils.debug(e);
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-            }
-        }
-
-        private void GCM() {
-            if (registrationId != Constants.NO_REGISTRATION_ID) {
-                Utils.debug("already register for GCM, skip it");
-                return;
-            }
-            if (checkPlayServices()) {
-                InstanceID instanceID = InstanceID.getInstance(mContext);
-                try {
-                    registrationId = instanceID.getToken(Constants.SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE);
-                    if (registrationId.equals(Constants.NO_REGISTRATION_ID)) {
-                        Utils.debug("register Google Cloud Messaging failed!");
-                    } else {
-                        Utils.debug("registration id: " + registrationId);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        // TODO: store registrationId locally
-//        private String getRegistrationId() {
-//        }
-
-        private void jsonToHashMap(JSONObject deviceChoiceJSONObject) {
-            Utils.debug("response for device: " + deviceChoiceJSONObject.toString());
-            try {
-                JSONObject choicesJSONObject = deviceChoiceJSONObject.getJSONObject(Constants.CHOICES);
-                JSONObject choiceForPackage = choicesJSONObject.getJSONObject(packageName);
-                Utils.debug("choices for package " + packageName + ": " + choiceForPackage.toString());
-                JSONObject labelJSONObject = choiceForPackage.getJSONObject(Constants.LABEL_JSON);
-                Iterator<String> iterator = labelJSONObject.keys();
-                while (iterator.hasNext()) {
-                    String label = iterator.next();
-
-                    JSONObject choiceJSONObject = labelJSONObject.getJSONObject(label);
-                    int choice = choiceJSONObject.getInt(Constants.CHOICE);
-
-                    Utils.debug(label + ": " + choice);
-                    variableMap.put(label, choice);
-                }
-                flush();
-            } catch (JSONException e) {
-                Utils.debug(e);
-                e.printStackTrace();
-            }
-        }
-
-        private boolean checkPlayServices() {
-            int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
-            if (resultCode != ConnectionResult.SUCCESS) {
-                Utils.debug("No Google Play Services!");
-                return false;
-            }
-            return true;
-        }
-
-
     }
 
     private class LogTask implements Runnable {
@@ -356,110 +154,195 @@ public class MaybeService {
 
     private MaybeService(Context context) {
         mContext = context;
-        // get MEID
+        // get deviceid
         this.getDeviceMEID();
         // TODO: change implementation to get Android package name
         this.setPackageName();
         // DONE: load local variables SYNC
-        this.initVariableMap();
-        // TODO: connect to Google Cloud Messaging ASYNC
-        // TODO: then connect to server ASYNC
+        // DONE: load mDevice
+        this.load();
+        // DONE: connect to Google Cloud Messaging ASYNC
+        // DONE: then connect to server ASYNC
         this.init();
-//        this.asyncTasks();
     }
 
-    protected void asyncTasks() {
-        Thread thread = new Thread(new AsyncTask());
-        thread.start();
+    private Observable<String> observableGCMID() {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                if (registrationId.equals(Constants.NO_REGISTRATION_ID)) {
+                    if (checkPlayServices()) {
+                        InstanceID instanceID = InstanceID.getInstance(mContext);
+                        try {
+                            registrationId = instanceID.getToken(Constants.SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE);
+                            if (registrationId.equals(Constants.NO_REGISTRATION_ID)) {
+                                Utils.debug("register Google Cloud Messaging failed!");
+                            } else {
+                                Utils.debug("registration id: " + registrationId);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                subscriber.onNext(registrationId);
+                subscriber.onCompleted();
+            }
+        });
+    }
+
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            Utils.debug("No Google Play Services!");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean hasActiveNetwork() {
+        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
     public void init() {
-        MaybeRESTService maybeRESTService = ServiceFactory.createRetrofitService(MaybeRESTService.class, Constants.BASE_URL);
-        Utils.debug("deviceid: " + mDeviceMEID);
-        Observable<List<Device>> get = maybeRESTService.getDevice(mDeviceMEID);
-        Observable<List<Device>> get2 = maybeRESTService.getDevice("001");
-        get.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Device>>() {
-                    @Override
-                    public void onCompleted() {
-                        Utils.debug("onCompleted");
-                    }
+        if (!hasActiveNetwork()) {
+            Utils.debug("No network connection, cancel init()");
+            return;
+        }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Utils.debug("onError: " + e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(List<Device> devices) {
-                        int size = devices.size();
-                        if (size == 0) {
-                            // TOOD: not register on backend
-                            Utils.debug("not register on backend!");
-                        } else {
-                            Device device = devices.get(0);
-                            Utils.debug("device: " + new Gson().toJson(device));
-                        }
-                    }
-                });
-        Device device = new Device();
-        device.deviceid = "001";
-        get2.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<Device>>() {
-                    @Override
-                    public void onCompleted() {
-                        Utils.debug("onCompleted");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Utils.debug("onError: " + e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(List<Device> devices) {
-                        int size = devices.size();
-                        if (size == 0) {
-                            // TOOD: not register on backend
-                            Utils.debug("not register on backend!");
-                        } else {
-                            Device device = devices.get(0);
-                            Utils.debug("device: " + new Gson().toJson(device));
-                        }
-                    }
-                });
-        Observable.zip(get, get2, new Func2<List<Device>, List<Device>, String>() {
-            @Override
-            public String call(List<Device> l1, List<Device> l2) {
-                Utils.debug("zip");
-                return l1.get(0).deviceid + " " + l2.get(0).deviceid;
-            }
-        }).subscribe(new Subscriber<String>() {
+        Observable<String> gcmID = this.observableGCMID()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
+        gcmID.subscribe(new Subscriber<String>() {
             @Override
             public void onCompleted() {
-                Utils.debug("zip complete");
+                Utils.debug("gcmID onCompleted");
             }
 
             @Override
             public void onError(Throwable e) {
-                Utils.debug("onError: " + e.getMessage());
+                Utils.debug("gcmID onError: " + e.getMessage());
             }
 
             @Override
             public void onNext(String s) {
-                Utils.debug("zip string: " + s);
+                Utils.debug("gcmID is: " + s);
+                registrationId = s;
             }
         });
 
-        Utils.debug("device: " + new Gson().toJson(device));
+
+        MaybeRESTService maybeRESTService = ServiceFactory.createRetrofitService(MaybeRESTService.class, Constants.BASE_URL);
+
+        Observable<List<Device>> get = maybeRESTService.getDevice(mDeviceMEID)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        get.subscribe(new Subscriber<List<Device>>() {
+            @Override
+            public void onCompleted() {
+                Utils.debug("GET onCompleted");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                // TODO: POST device
+                Utils.debug("GET onError: " + e.getMessage());
+                postDevice();
+            }
+
+            @Override
+            public void onNext(List<Device> devices) {
+                if (devices.size() == 0) {
+                    Utils.debug("GET got 0 result, try POST it");
+                    postDevice();
+                    return;
+                }
+                Device device = devices.get(0);
+                Utils.debug("GET: " + new Gson().toJson(device));
+                if (registrationId.equals(device.gcmid)) {
+                    Utils.debug("GET updated result, just finish");
+                    finish(device);
+                } else {
+                    Utils.debug("GET result with conflict gcmid, try PUT");
+                    putDevice(device);
+                }
+            }
+        });
     }
 
+    private void postDevice() {
+        Device device = new Device();
+        device.deviceid = mDeviceMEID;
+        if (registrationId != Constants.NO_REGISTRATION_ID) {
+            device.gcmid = registrationId;
+        }
+        Utils.debug("POST device: " + new Gson().toJson(device));
+        MaybeRESTService maybeRESTService = ServiceFactory.createRetrofitService(MaybeRESTService.class, Constants.BASE_URL);
+        Observable<Device> postDevice = maybeRESTService.postDevice(device);
+        postDevice.subscribe(new Subscriber<Device>() {
+            @Override
+            public void onCompleted() {
+                Utils.debug("POST onCompleted");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Utils.debug("TODO POST onError: " + e.getMessage());
+            }
+
+            @Override
+            public void onNext(Device device) {
+                Utils.debug("POST result: " + new Gson().toJson(device));
+                finish(device);
+            }
+        });
+    }
+
+    private void putDevice(Device device) {
+        if (!device.deviceid.equals(mDeviceMEID)) {
+            Utils.debug("The device.deviceid " + device.deviceid + " is not equals with mDeviceMEID: " + mDeviceMEID);
+        }
+        if (registrationId != Constants.NO_REGISTRATION_ID) {
+            device.gcmid = registrationId;
+        }
+        Utils.debug("PUT device: " + new Gson().toJson(device));
+        MaybeRESTService maybeRESTService = ServiceFactory.createRetrofitService(MaybeRESTService.class, Constants.BASE_URL);
+        Observable<Device> putDevice = maybeRESTService.putDevice(mDeviceMEID, device);
+        putDevice.subscribe(new Subscriber<Device>() {
+            @Override
+            public void onCompleted() {
+                Utils.debug("PUT onCompleted");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                e.printStackTrace();
+                Utils.debug("TODO PUT onError: " + e.getMessage());
+            }
+
+            @Override
+            public void onNext(Device device) {
+                Utils.debug("PUT result: " + new Gson().toJson(device));
+                finish(device);
+            }
+        });
+    }
+
+    private void finish(Device device) {
+        mDevice = device;
+        Utils.debug("Finish with device: " + new Gson().toJson(mDevice));
+        flush();
+    }
+
+    // TODO: store registrationId locally
+//        private String getRegistrationId() {
+//        }
+
     private void setPackageName() {
-        this.packageName = "testing_inputs.maybe";
         this.packageName = mContext.getPackageName();
-        Utils.debug("Real package name: " + this.packageName);
     }
 
     private String getDeviceMEID() {
@@ -472,53 +355,47 @@ public class MaybeService {
         return mDeviceMEID;
     }
 
-    @SuppressWarnings("unchecked")
-    private void initVariableMap() {
-        if (this.variableMap == null) {
-            try {
-                FileInputStream fileInputStream = mContext.openFileInput(Constants.MAP_FILE);
-                ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-
-                Object object = objectInputStream.readObject();
-                this.variableMap = (HashMap<String, Integer>) object;
-
-                objectInputStream.close();
-                fileInputStream.close();
-            } catch (Exception e) {
-                Utils.debug(e);
-                this.variableMap = new HashMap<String, Integer>();
-            }
-        }
+    private void flush() {
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Constants.SHARED_PREFERENCE_KEY, new Gson().toJson(mDevice));
+        editor.apply();
     }
 
-    private void flush() {
-        ObjectOutputStream objectOutputStream;
-        try {
-            objectOutputStream = new ObjectOutputStream(mContext.openFileOutput(Constants.MAP_FILE, Context.MODE_PRIVATE));
-
-            objectOutputStream.writeObject(this.variableMap);
-
-            objectOutputStream.close();
-        } catch (Exception e) {
-            Utils.debug(e);
-        }
+    private void load() {
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        String jsonString = sharedPreferences.getString(Constants.SHARED_PREFERENCE_KEY, "");
+        Utils.debug("Load from SharedPreferences: " + jsonString);
+        mDevice = new Gson().fromJson(jsonString, Device.class);
     }
 
     public int get(String label) {
-        Integer choice = this.variableMap.get(label);
-        if (choice == null) {
-            choice = Constants.DEFAULT_CHOICE;
-            this.variableMap.put(label, choice);
-            this.flush();
-        } else {
-            this.variableMap.put(label, choice + 1);
-            this.flush();
+        if (mDevice == null) {
+            Utils.debug("Call get(" + label + ") before service is ready!");
+            return 0;
         }
-        return choice;
+        if (mDevice.choices == null) {
+            Utils.debug("mDevice.choices is null: " + new Gson().toJson(mDevice));
+            return 0;
+        }
+        PackageChoices choices = mDevice.choices.get(packageName);
+        if (choices == null) {
+            Utils.debug("No PackageChoices for package: " + packageName + " from mDevice: " + new Gson().toJson(mDevice));
+            return 0;
+        }
+        if (choices.labelJSON == null) {
+            Utils.debug("mDevice.choices.labelJSON is null: " + new Gson().toJson(mDevice));
+            return 0;
+        }
+        Choice choice = choices.labelJSON.get(label);
+        if (choice == null) {
+            Utils.debug("mDevice.choices.labelJSON.label is null: " + new Gson().toJson(mDevice));
+            return 0;
+        }
+        return choice.choice;
     }
 
     public void log(JSONObject logObject) {
-
         Thread thread = new Thread(new LogTask(logObject));
         thread.start();
     }

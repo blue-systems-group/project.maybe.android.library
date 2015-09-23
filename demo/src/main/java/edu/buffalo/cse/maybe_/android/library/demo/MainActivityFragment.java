@@ -47,7 +47,7 @@ public class MainActivityFragment extends Fragment {
     }
 
     public void testMaybeVariable() {
-        int choice = maybeService.get("another block test");
+        int choice = maybeService.get("test");
         Utils.debug("choice: " + choice);
         switch (choice) {
             case 0:
@@ -87,6 +87,6 @@ public class MainActivityFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        maybeService.log(logging);
+//        maybeService.log(logging);
     }
 }
