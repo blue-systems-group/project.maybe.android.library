@@ -2,6 +2,7 @@ package edu.buffalo.cse.maybe_.android.library.demo;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,28 @@ import edu.buffalo.cse.maybe_.android.library.utils.Utils;
 public class MainActivityFragment extends Fragment {
 
     private MaybeService maybeService;
+    private Handler timerHandler = new Handler();
+
+    Runnable timerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            TextView textView = (TextView) getActivity().findViewById(R.id.hello_world);
+            String maybeText = maybe("String") {"Maybe String 1", "Maybe String 2"};
+            textView.setText(maybeText);
+            maybe("color") {
+                textView.setBackgroundColor(Color.RED);
+            } or {
+                textView.setBackgroundColor(Color.YELLOW);
+            } or {
+                textView.setBackgroundColor(Color.GREEN);
+            } or {
+                textView.setBackgroundColor(Color.WHITE);
+            }
+            timerHandler.postDelayed(this, 500);
+        }
+    };
+
 
     public MainActivityFragment() {
     }
@@ -41,19 +64,13 @@ public class MainActivityFragment extends Fragment {
     }
 
     public void onResume() {
+        timerHandler.postDelayed(timerRunnable, 0);
         super.onResume();
-        TextView textView = (TextView) getActivity().findViewById(R.id.hello_world);
-        String maybeText = maybe("String") {"Maybe String 1", "Maybe String 2"};
-        textView.setText(maybeText);
-        maybe("color") {
-            textView.setBackgroundColor(Color.RED);
-        } or {
-            textView.setBackgroundColor(Color.YELLOW);
-        } or {
-            textView.setBackgroundColor(Color.GREEN);
-        } or {
-            textView.setBackgroundColor(Color.WHITE);
-        }
+    }
+
+    public void onPause() {
+        timerHandler.removeCallbacks(timerRunnable);
+        super.onPause();
     }
 
     public void testMaybeVariable() {
