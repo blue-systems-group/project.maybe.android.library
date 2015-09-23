@@ -36,11 +36,19 @@ repositories {
     }
 }
 
+configurations {
+    maybe
+}
+
 dependencies {
     //    compile(name: 'maybe', ext: 'aar')
     compile project(':library')
     compile 'com.google.android.gms:play-services:7.8.0'
     testCompile 'junit:junit:4.12'
+    maybe 'com.google.code.gson:gson:2.3.1'
+    maybe 'com.squareup.retrofit:converter-gson:2.0.0-beta1'
+    maybe 'com.squareup.retrofit:retrofit:2.0.0-beta1'
+    maybe fileTree(dir: '../libs-maybe', include: '*.jar')
 }
 
 def manifestPackage() {
@@ -95,7 +103,7 @@ afterEvaluate {
                 }
 
                 // TODO: use maven to get maybe libs
-                classpath fileTree(dir: '../libs-maybe', include: '*.jar')
+                classpath configurations.maybe
 
                 main = 'edu.buffalo.cse.blue.maybe.Main'
 
