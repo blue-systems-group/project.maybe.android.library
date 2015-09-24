@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -27,19 +28,19 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         public void run() {
-            TextView textView = (TextView) getActivity().findViewById(R.id.hello_world);
-            String maybeText = maybe("String") {"Maybe String 1", "Maybe String 2"};
-            textView.setText(maybeText);
-            maybe("color") {
-                textView.setBackgroundColor(Color.RED);
-            } or {
-                textView.setBackgroundColor(Color.YELLOW);
-            } or {
-                textView.setBackgroundColor(Color.GREEN);
-            } or {
-                textView.setBackgroundColor(Color.WHITE);
-            }
-            timerHandler.postDelayed(this, 500);
+//            TextView textView = (TextView) getActivity().findViewById(R.id.hello_world);
+//            String maybeText = maybe("String") {"Maybe String 1", "Maybe String 2"};
+//            textView.setText(maybeText);
+//            maybe("color") {
+//                textView.setBackgroundColor(Color.RED);
+//            } or {
+//                textView.setBackgroundColor(Color.YELLOW);
+//            } or {
+//                textView.setBackgroundColor(Color.GREEN);
+//            } or {
+//                textView.setBackgroundColor(Color.WHITE);
+//            }
+//            timerHandler.postDelayed(this, 500);
         }
     };
 
@@ -64,14 +65,34 @@ public class MainActivityFragment extends Fragment {
     }
 
     public void onResume() {
-        timerHandler.postDelayed(timerRunnable, 0);
+//        timerHandler.postDelayed(timerRunnable, 0);
+        Button updateButton = (Button) getActivity().findViewById(R.id.update);
+        updateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TextView textView = (TextView) getActivity().findViewById(R.id.hello_world);
+                String maybeText = maybe("String") {"Maybe String 1", "Maybe String 2"};
+                textView.setText(maybeText);
+                maybe("color") {
+                    textView.setBackgroundColor(Color.RED);
+                } or {
+                    textView.setBackgroundColor(Color.YELLOW);
+                } or {
+                    textView.setBackgroundColor(Color.GREEN);
+                } or {
+                    textView.setBackgroundColor(Color.WHITE);
+                }
+            }
+        });
+
         super.onResume();
     }
 
     public void onPause() {
-        timerHandler.removeCallbacks(timerRunnable);
+//        timerHandler.removeCallbacks(timerRunnable);
         super.onPause();
     }
+
 
     public void testMaybeVariable() {
         int choice = maybeService.get("test");
