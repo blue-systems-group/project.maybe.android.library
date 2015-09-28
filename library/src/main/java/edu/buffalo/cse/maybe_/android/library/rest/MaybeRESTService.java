@@ -21,4 +21,7 @@ public interface MaybeRESTService {
 
     @POST("devices/")
     Observable<Device> postDevice(@Body Device device);
+
+    @POST("logs/{deviceID}/{packageName}")
+    Observable<LogResponse> postLog(@Path("deviceID") String deviceID, @Path("packageName") String packageName, @Body MaybeLog logObject);
 }
