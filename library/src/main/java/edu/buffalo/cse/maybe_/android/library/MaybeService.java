@@ -1,5 +1,7 @@
 package edu.buffalo.cse.maybe_.android.library;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -12,10 +14,7 @@ import android.telephony.TelephonyManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.gcm.PeriodicTask;
-import com.google.android.gms.gcm.Task;
 import com.google.android.gms.iid.InstanceID;
 import com.google.gson.Gson;
 
@@ -33,12 +32,12 @@ import edu.buffalo.cse.maybe_.android.library.rest.MaybeRESTService;
 import edu.buffalo.cse.maybe_.android.library.rest.PackageChoices;
 import edu.buffalo.cse.maybe_.android.library.rest.ServiceFactory;
 import edu.buffalo.cse.maybe_.android.library.services.LogIntentService;
-import edu.buffalo.cse.maybe_.android.library.services.SyncChoiceService;
 import edu.buffalo.cse.maybe_.android.library.utils.Constants;
 import edu.buffalo.cse.maybe_.android.library.utils.Utils;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
@@ -58,7 +57,6 @@ public class MaybeService {
     private static String registrationId = Constants.NO_REGISTRATION_ID;
 
     // TODO: add set method for url and sender id
-    private static String SENDER_ID = "1068479230660";
     private static int label_count = 0;
     private static final long MAX_SIZE = 10;
 
@@ -186,11 +184,12 @@ public class MaybeService {
             this.syncWithBackend();
         } else {
             this.load();
-            if (!this.hasPeriodicTask()) {
-                this.periodicTask();
-            } else {
-                Utils.debug("Periodic Task already exist!");
-            }
+            this.setRepeatPull(mContext);
+//            if (!this.hasPeriodicTask()) {
+//                this.periodicTask();
+//            } else {
+//                Utils.debug("Periodic Task already exist!");
+//            }
         }
         // DONE: load local variables SYNC
         // DONE: load mDevice
@@ -198,38 +197,39 @@ public class MaybeService {
         // DONE: then connect to server ASYNC
     }
 
-    private Observable<String> observableGCMID() {
-        return Observable.create(new Observable.OnSubscribe<String>() {
-            @Override
-            public void call(Subscriber<? super String> subscriber) {
-                SharedPreferences sharedPreferences = mContext.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
-                registrationId = sharedPreferences.getString(Constants.SHARED_PREFERENCE_GCM_ID, Constants.NO_REGISTRATION_ID);
+    final MaybeRESTService maybeRESTService = ServiceFactory.createRetrofitService(MaybeRESTService.class, Constants.BASE_URL);
 
-                if (registrationId.equals(Constants.NO_REGISTRATION_ID)) {
-                    if (checkPlayServices()) {
-                        InstanceID instanceID = InstanceID.getInstance(mContext);
-                        try {
-                            registrationId = instanceID.getToken(Constants.SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE);
-                            if (registrationId.equals(Constants.NO_REGISTRATION_ID)) {
-                                Utils.debug("register Google Cloud Messaging failed!");
-                            } else {
-                                Utils.debug("registration id: " + registrationId);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString(Constants.SHARED_PREFERENCE_GCM_ID, registrationId);
-                                editor.apply();
+    Observable<String> observableGCMID = Observable.create(new Observable.OnSubscribe<String>() {
+        @Override
+        public void call(Subscriber<? super String> subscriber) {
+            SharedPreferences sharedPreferences = mContext.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+            registrationId = sharedPreferences.getString(Constants.SHARED_PREFERENCE_GCM_ID, Constants.NO_REGISTRATION_ID);
+
+            if (registrationId.equals(Constants.NO_REGISTRATION_ID)) {
+                if (checkPlayServices()) {
+                    InstanceID instanceID = InstanceID.getInstance(mContext);
+                    try {
+                        registrationId = instanceID.getToken(Constants.SENDER_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE);
+                        if (registrationId.equals(Constants.NO_REGISTRATION_ID)) {
+                            Utils.debug("register Google Cloud Messaging failed!");
+                        } else {
+                            Utils.debug("registration id: " + registrationId);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString(Constants.SHARED_PREFERENCE_GCM_ID, registrationId);
+                            if (!editor.commit()) {
+                                Utils.debug("Update registrationId failed!");
                             }
-                        } catch (IOException e) {
-                            e.printStackTrace();
                         }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        subscriber.onError(e);
                     }
                 }
-                subscriber.onNext(registrationId);
-                subscriber.onCompleted();
             }
-        })
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
+            subscriber.onNext(registrationId);
+            subscriber.onCompleted();
+        }
+    }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
     private boolean checkPlayServices() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
@@ -252,126 +252,61 @@ public class MaybeService {
             return;
         }
 
-        Observable<String> gcmID = this.observableGCMID();
-
-        MaybeRESTService maybeRESTService = ServiceFactory.createRetrofitService(MaybeRESTService.class, Constants.BASE_URL);
-        Observable<List<Device>> get = maybeRESTService.getDevice(mDeviceMEID);
-
-        get.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
-
-        Observable<Device> zip = Observable.zip(gcmID, get, new Func2<String, List<Device>, Device>() {
-            @Override
-            public Device call(String s, List<Device> devices) {
-                Utils.debug("zip called, gcmid: " + s + " device: " + new Gson().toJson(devices.get(0)));
-                registrationId = s;
-                if (devices.size() == 0) {
-                    Utils.debug("GET got 0 result, try POST it");
-                    postDevice();
-                    return mDevice;
+        Observable<Device> zip = Observable.zip(observableGCMID, maybeRESTService.getDevice(mDeviceMEID), new Func2<String, List<Device>, Device>() {
+                    @Override
+                    public Device call(String s, List<Device> devices) {
+                        return devices.size() > 0 ? devices.get(0) : null;
+                    }
                 }
-                Device device = devices.get(0);
-                Utils.debug("GET: " + new Gson().toJson(device));
-                if (registrationId.equals(device.gcmid)) {
-                    Utils.debug("GET updated result, just finish");
-                    finish(device);
-                    return mDevice;
-                } else {
+        );
+
+        Observable<Device> serverDevice = zip.flatMap(new Func1<Device, Observable<Device>>() {
+            @Override
+            public Observable<Device> call(Device device) {
+                if (device == null || !mDeviceMEID.equals(device.deviceid)) {
+                    // DONE: POST and log
+                    if (device != null) {
+                        Utils.debug("The device.deviceid " + device.deviceid + " is not equals with mDeviceMEID: " + mDeviceMEID);
+                    }
+                    device = new Device();
+                    device.deviceid = mDeviceMEID;
+                    if (registrationId != Constants.NO_REGISTRATION_ID) {
+                        device.gcmid = registrationId;
+                    }
+                    Utils.debug("POST device: " + new Gson().toJson(device));
+                    return maybeRESTService.postDevice(device);
+                }
+                if (!registrationId.equals(Constants.NO_REGISTRATION_ID) && !registrationId.equals(device.gcmid)) {
+                    // TODO: PUT and log
                     Utils.debug("GET result with conflict gcmid, try PUT. Local gcmid: " + registrationId + " server gcmid: " + device.gcmid);
-                    putDevice(device);
-                    return mDevice;
+                    device.gcmid = registrationId;
+                    Utils.debug("PUT device: " + new Gson().toJson(device));
+                    return maybeRESTService.putDevice(mDeviceMEID, device);
                 }
+                // No local gcm id, just return
+                Utils.debug("Just return GET result!");
+                return Observable.just(device);
             }
         });
 
-        zip.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
-
-        zip.subscribe(new Subscriber<Device>() {
+        serverDevice.subscribe(new Subscriber<Device>() {
             @Override
             public void onCompleted() {
-                Utils.debug("zip onCompleted");
+                Utils.debug("serverDevice onCompleted");
             }
 
             @Override
             public void onError(Throwable e) {
-                Utils.debug("zip onError: " + e.getMessage());
+                Utils.debug("serverDevice onError: " + e.getMessage());
             }
 
             @Override
             public void onNext(Device device) {
-                Utils.debug("zip onNext, device: " + device);
+                flush(device);
+                Utils.debug("serverDevice onNext, device: " + new Gson().toJson(device));
             }
         });
     }
-
-    private void postDevice() {
-        Device device = new Device();
-        device.deviceid = mDeviceMEID;
-        if (registrationId != Constants.NO_REGISTRATION_ID) {
-            device.gcmid = registrationId;
-        }
-        Utils.debug("POST device: " + new Gson().toJson(device));
-        MaybeRESTService maybeRESTService = ServiceFactory.createRetrofitService(MaybeRESTService.class, Constants.BASE_URL);
-        Observable<Device> postDevice = maybeRESTService.postDevice(device);
-        postDevice.subscribe(new Subscriber<Device>() {
-            @Override
-            public void onCompleted() {
-                Utils.debug("POST onCompleted");
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Utils.debug("TODO POST onError: " + e.getMessage());
-            }
-
-            @Override
-            public void onNext(Device device) {
-                Utils.debug("POST result: " + new Gson().toJson(device));
-                finish(device);
-            }
-        });
-    }
-
-    private void putDevice(Device device) {
-        if (!device.deviceid.equals(mDeviceMEID)) {
-            Utils.debug("The device.deviceid " + device.deviceid + " is not equals with mDeviceMEID: " + mDeviceMEID);
-        }
-        if (registrationId != Constants.NO_REGISTRATION_ID) {
-            device.gcmid = registrationId;
-        }
-        Utils.debug("PUT device: " + new Gson().toJson(device));
-        MaybeRESTService maybeRESTService = ServiceFactory.createRetrofitService(MaybeRESTService.class, Constants.BASE_URL);
-        Observable<Device> putDevice = maybeRESTService.putDevice(mDeviceMEID, device);
-        putDevice.subscribe(new Subscriber<Device>() {
-            @Override
-            public void onCompleted() {
-                Utils.debug("PUT onCompleted");
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-                Utils.debug("TODO PUT onError: " + e.getMessage());
-            }
-
-            @Override
-            public void onNext(Device device) {
-                Utils.debug("PUT result: " + new Gson().toJson(device));
-                finish(device);
-            }
-        });
-    }
-
-    private void finish(Device device) {
-        mDevice = device;
-        Utils.debug("Finish with device: " + new Gson().toJson(mDevice));
-        flush();
-    }
-
-    // TODO: store registrationId locally
-//        private String getRegistrationId() {
-//        }
 
     private void setPackageName() {
         this.packageName = mContext.getPackageName();
@@ -383,15 +318,15 @@ public class MaybeService {
             mDeviceMEID = tm.getDeviceId();
             Utils.debug("getDeviceMEID() return: " + mDeviceMEID);
         }
-//        mDeviceMEID = "35823905271971";
         return mDeviceMEID;
     }
 
-    private void flush() {
+    private boolean flush(Device device) {
+        mDevice = device;
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(Constants.SHARED_PREFERENCE_KEY, new Gson().toJson(mDevice));
-        editor.apply();
+        return editor.commit();
     }
 
     private void load() {
@@ -401,53 +336,41 @@ public class MaybeService {
         mDevice = new Gson().fromJson(jsonString, Device.class);
     }
 
-    public boolean hasPeriodicTask() {
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        Boolean hasPeriodTask = sharedPreferences.getBoolean(Constants.HAS_PERIODIC_TASK, false);
-        return hasPeriodTask;
-    }
-
-    public void periodicTask() {
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(Constants.HAS_PERIODIC_TASK, true);
-        editor.apply();
-        Utils.debug("setup periodicTask");
-        PeriodicTask periodicTask = new PeriodicTask.Builder()
-                .setService(SyncChoiceService.class)
-                .setPeriod(Constants.SYNC_INTERVAL)
-                .setFlex(Constants.SYNC_INTERVAL)
-                .setTag(Constants.PERIODIC_TASK_TAG)
-                .setPersisted(true)
-                .setUpdateCurrent(true)
-                .setRequiredNetwork(Task.NETWORK_STATE_ANY)
-                .setRequiresCharging(false)
-                .build();
-        GcmNetworkManager.getInstance(mContext).schedule(periodicTask);
+    public void setRepeatPull(Context context) {
+        Intent intent = new Intent(Constants.PULL_INTENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_NO_CREATE);
+        if (pendingIntent == null) {
+            pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            Utils.debug("Set repeat pull for every " + (Constants.PULL_INTERVAL / 1000) + " seconds");
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis(), Constants.PULL_INTERVAL, pendingIntent);
+        } else {
+            Utils.debug("PULL PendingIntent already exist, cancel setRepeatPull!");
+        }
     }
 
     public int get(String label) {
         if (mDevice == null) {
             Utils.debug("Call get(" + label + ") before service is ready!");
-            return 0;
+            return Constants.DEFAULT_CHOICE;
         }
         if (mDevice.choices == null) {
             Utils.debug("mDevice.choices is null: " + new Gson().toJson(mDevice));
-            return 0;
+            return Constants.DEFAULT_CHOICE;
         }
         PackageChoices choices = mDevice.choices.get(packageName);
         if (choices == null) {
             Utils.debug("No PackageChoices for package: " + packageName + " from mDevice: " + new Gson().toJson(mDevice));
-            return 0;
+            return Constants.DEFAULT_CHOICE;
         }
         if (choices.labelJSON == null) {
             Utils.debug("mDevice.choices.labelJSON is null: " + new Gson().toJson(mDevice));
-            return 0;
+            return Constants.DEFAULT_CHOICE;
         }
         Choice choice = choices.labelJSON.get(label);
         if (choice == null) {
             Utils.debug("mDevice.choices.labelJSON.label is null: " + new Gson().toJson(mDevice));
-            return 0;
+            return Constants.DEFAULT_CHOICE;
         }
         Utils.debug("get(" + label + ") = " + choice.choice);
         return choice.choice;
