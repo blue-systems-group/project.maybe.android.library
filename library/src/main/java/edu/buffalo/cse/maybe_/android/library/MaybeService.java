@@ -326,6 +326,7 @@ public class MaybeService {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(Constants.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(Constants.SHARED_PREFERENCE_KEY, new Gson().toJson(mDevice));
+        Utils.debug("flush mDevice to cache.");
         return editor.commit();
     }
 

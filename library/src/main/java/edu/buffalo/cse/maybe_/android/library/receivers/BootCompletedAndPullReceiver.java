@@ -18,9 +18,6 @@ public class BootCompletedAndPullReceiver extends BroadcastReceiver {
         if (intentAction.equalsIgnoreCase(Intent.ACTION_BOOT_COMPLETED)) {
             Utils.debug("receive BOOT UP intent. Simulate app init MaybeService");
             MaybeService maybeService = MaybeService.getInstance(context, true);
-//            Utils.debug("Manually call syncWithBackend");
-//            maybeService.syncWithBackend();
-            // maybeService.periodicTask();
             maybeService.setRepeatPull(context);
         } else if (intentAction.equalsIgnoreCase(Constants.PULL_INTENT)) {
             Utils.debug("receive PULL intent. Start sync");
