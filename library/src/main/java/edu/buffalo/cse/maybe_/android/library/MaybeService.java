@@ -26,10 +26,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import edu.buffalo.cse.maybe_.android.library.log.LogHandler;
 import edu.buffalo.cse.maybe_.android.library.rest.Choice;
 import edu.buffalo.cse.maybe_.android.library.rest.Device;
-import edu.buffalo.cse.maybe_.android.library.rest.LogResponse;
-import edu.buffalo.cse.maybe_.android.library.rest.MaybeLog;
 import edu.buffalo.cse.maybe_.android.library.rest.MaybeRESTService;
 import edu.buffalo.cse.maybe_.android.library.rest.PackageChoices;
 import edu.buffalo.cse.maybe_.android.library.rest.ServiceFactory;
@@ -55,6 +54,8 @@ public class MaybeService {
     private String packageName;
 
     private Device mDevice;
+
+    private LogHandler logHandler;
 
     private static String registrationId = Constants.NO_REGISTRATION_ID;
 
@@ -380,33 +381,15 @@ public class MaybeService {
     }
 
     public void log(String label, JSONObject logObject) {
-        // 1. cache mechanism
-        // TODO: cache to file
-        // TODO: periodic task to update
+        if (this.logHandler == null) {
+            this.logHandler = new LogHandler(mContext, mDeviceMEID, packageName);
+        }
+        this.logHandler.log(label, logObject);
+    }
 
-        // 2. real-time mechanism
-        // TODO: just POST
-        final MaybeLog maybeLog = new MaybeLog(label, logObject, mContext);
-        Observable<LogResponse> postLog = maybeRESTService.postLog(mDeviceMEID, packageName, maybeLog)
-                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-
-        postLog.subscribe(new Subscriber<LogResponse>() {
-            @Override
-            public void onCompleted() {
-                Gson gson = new Gson();
-                Utils.debug("postLog onCompleted: " + gson.toJson(maybeLog));
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Utils.debug("postLog onError: " + e.getMessage());
-            }
-
-            @Override
-            public void onNext(LogResponse logResponse) {
-                Gson gson = new Gson();
-                Utils.debug("postLog onNext: " + gson.toJson(logResponse));
-            }
-        });
+    public void close() {
+        if (this.logHandler != null) {
+            this.logHandler.close();
+        }
     }
 }

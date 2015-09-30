@@ -8,7 +8,7 @@ public class Constants {
     public static final String PULL_INTENT = "edu.buffalo.cse.maybe_.android.library.pull_intent";
 
     // TODO: put this in external json file
-    public static String BASE_URL = "http://maybe.xcv58.me/maybe-api-v1/";
+    public static String BASE_URL = "http://maybe.cse.buffalo.edu/maybe-api-v1/";
     public static final String SENDER_ID = "1068479230660";
 
     public static final String TAG = "Maybe_Library";
