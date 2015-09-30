@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import edu.buffalo.cse.maybe_.android.library.log.LogHandler;
@@ -254,10 +255,18 @@ public class MaybeService {
             Utils.debug("No network connection, cancel syncWithBackend()");
             return;
         }
-
-        Observable<Device> zip = Observable.zip(observableGCMID, maybeRESTService.getDevice(mDeviceMEID), new Func2<String, List<Device>, Device>() {
+        Observable<List<Device>> getObservable = maybeRESTService.getDevice(mDeviceMEID)
+                .onErrorReturn(new Func1<Throwable, List<Device>>() {
+                    @Override
+                    public List<Device> call(Throwable throwable) {
+                        Utils.debug(throwable.getMessage());
+                        return new LinkedList<Device>();
+                    }
+                });
+        Observable<Device> zip = Observable.zip(observableGCMID, getObservable, new Func2<String, List<Device>, Device>() {
                     @Override
                     public Device call(String s, List<Device> devices) {
+                        Utils.debug("deivce: " + devices);
                         return devices.size() > 0 ? devices.get(0) : null;
                     }
                 }
