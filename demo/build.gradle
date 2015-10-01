@@ -66,6 +66,7 @@ afterEvaluate {
                 doFirst {
                     def arguments = args
                     arguments.addAll(['-g', '-c', '-D', tempDir])
+                    arguments.addAll(['-upload'])
                     arguments.addAll(['-noserial', '-postcompiler', 'javac'])
                     arguments.addAll(['-package', manifestPackage()])
 
