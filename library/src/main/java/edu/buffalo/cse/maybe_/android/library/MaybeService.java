@@ -10,7 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
-import android.telephony.TelephonyManager;
+import android.provider.Settings;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -51,7 +51,7 @@ public class MaybeService {
 
     private Context mContext;
 
-    private String mDeviceMEID;
+    private String mDeviceID;
     private String packageName;
 
     private Device mDevice;
@@ -120,7 +120,7 @@ public class MaybeService {
                 deviceJSONObject.put("timestamp", timeElapsed);
                 deviceJSONObject.put("batterystatus", batteryLevel);
                 deviceJSONObject.put("logObject", logJSONObject);
-                deviceJSONObject.put(Constants.DEVICE_ID, mDeviceMEID);
+                deviceJSONObject.put(Constants.DEVICE_ID, mDeviceID);
 
                 //logic to save into file locally
                 String localCache = "LocalCache" + label_count;
@@ -179,8 +179,8 @@ public class MaybeService {
 
     private MaybeService(Context context, boolean needSync) {
         mContext = context;
-        // get deviceid
-        this.getDeviceMEID();
+        // get deviceID
+        this.getDeviceID();
         // TODO: change implementation to get Android package name
         this.setPackageName();
         if (needSync) {
@@ -255,7 +255,7 @@ public class MaybeService {
             Utils.debug("No network connection, cancel syncWithBackend()");
             return;
         }
-        Observable<List<Device>> getObservable = maybeRESTService.getDevice(mDeviceMEID)
+        Observable<List<Device>> getObservable = maybeRESTService.getDevice(mDeviceID)
                 .onErrorReturn(new Func1<Throwable, List<Device>>() {
                     @Override
                     public List<Device> call(Throwable throwable) {
@@ -275,13 +275,13 @@ public class MaybeService {
         Observable<Device> serverDevice = zip.flatMap(new Func1<Device, Observable<Device>>() {
             @Override
             public Observable<Device> call(Device device) {
-                if (device == null || !mDeviceMEID.equals(device.deviceid)) {
+                if (device == null || !mDeviceID.equals(device.deviceid)) {
                     // DONE: POST and log
                     if (device != null) {
-                        Utils.debug("The device.deviceid " + device.deviceid + " is not equals with mDeviceMEID: " + mDeviceMEID);
+                        Utils.debug("The device.deviceid " + device.deviceid + " is not equals with mDeviceID: " + mDeviceID);
                     }
                     device = new Device();
-                    device.deviceid = mDeviceMEID;
+                    device.deviceid = mDeviceID;
                     if (registrationId != Constants.NO_REGISTRATION_ID) {
                         device.gcmid = registrationId;
                     }
@@ -293,7 +293,7 @@ public class MaybeService {
                     Utils.debug("GET result with conflict gcmid, try PUT. Local gcmid: " + registrationId + " server gcmid: " + device.gcmid);
                     device.gcmid = registrationId;
                     Utils.debug("PUT device: " + new Gson().toJson(device));
-                    return maybeRESTService.putDevice(mDeviceMEID, device);
+                    return maybeRESTService.putDevice(mDeviceID, device);
                 }
                 // No local gcm id, just return
                 Utils.debug("Just return GET result!");
@@ -324,13 +324,12 @@ public class MaybeService {
         this.packageName = mContext.getPackageName();
     }
 
-    private String getDeviceMEID() {
-        if (mDeviceMEID == null) {
-            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-            mDeviceMEID = tm.getDeviceId();
-            Utils.debug("getDeviceMEID() return: " + mDeviceMEID);
+    private String getDeviceID() {
+        if (mDeviceID == null) {
+            mDeviceID = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+            Utils.debug("getDeviceID() return: " + mDeviceID);
         }
-        return mDeviceMEID;
+        return mDeviceID;
     }
 
     private boolean flush(Device device) {
@@ -391,7 +390,7 @@ public class MaybeService {
 
     public void log(String label, JSONObject logObject) {
         if (this.logHandler == null) {
-            this.logHandler = new LogHandler(mContext, mDeviceMEID, packageName);
+            this.logHandler = new LogHandler(mContext, mDeviceID, packageName);
         }
         this.logHandler.log(label, logObject);
     }
