@@ -6,7 +6,7 @@ apply plugin: 'com.jfrog.bintray'
 description = 'Maybe Android Library'
 
 // This is the library version used when deploying the artifact
-version = '0.0.1'
+version = '0.0.2'
 
 android {
     compileSdkVersion 22
@@ -43,6 +43,7 @@ install {
 
                 // Add your description here
                 name 'Maybe Android Library'
+                description 'Maybe Android Library'
                 url siteUrl
 
                 // Set your license
