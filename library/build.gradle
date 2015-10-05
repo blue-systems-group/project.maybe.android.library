@@ -77,13 +77,13 @@ bintray {
     key = properties.getProperty("bintray.apikey")
 
     configurations = ['archives']
+    publish = true
     pkg {
         repo = "maven"
         name = "maybe-android-library"
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["MIT"]
-        publish = true
     }
 }
 
