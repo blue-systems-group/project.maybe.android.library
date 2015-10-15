@@ -1,11 +1,12 @@
 apply plugin: 'com.android.application'
 
+description = 'Yousuf\'s Demo App for Maybe Android Library'
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
-
     defaultConfig {
-        applicationId "edu.buffalo.cse.maybe.bluedemo"
+        applicationId 'edu.buffalo.cse.maybe.bluedemo'
         minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
@@ -17,8 +18,98 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+configurations {
+    maybe
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    //    compile(name: 'maybe', ext: 'aar')
+    compile project(':library')
+    compile 'com.google.android.gms:play-services:7.8.0'
+    testCompile 'junit:junit:4.12'
+    maybe 'com.google.code.gson:gson:2.3.1'
+    maybe 'com.squareup.retrofit:converter-gson:2.0.0-beta1'
+    maybe 'com.squareup.retrofit:retrofit:2.0.0-beta1'
+    maybe fileTree(dir: '../libs-maybe', include: '*.jar')
+}
+
+def manifestPackage() {
+//     TODO: use actual package name in build process instead of parse AndroidManifest.xml manually
+//    def manifestFile = file(project.projectDir.absolutePath + '/src/main/AndroidManifest.xml')
+//    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+//    def xml = new XmlParser().parse(manifestFile)
+//    return xml.attributes().package
+//    TODO: is there a better way for both application and library? Now it works only for application
+    return android.defaultConfig.applicationId
+}
+
+afterEvaluate {
+    def javaCompileTasks = tasks.withType(JavaCompile).collect()
+    javaCompileTasks.each {
+        task ->
+            def newTaskName = task.name + 'Maybe'
+            def options = task.getOptions()
+            def destinationDir = task.destinationDir
+            def tempDir = new File(destinationDir.toString() + 'maybe')
+            tasks.create(name: newTaskName, type: JavaExec, overwrite: true) {
+                // setup input and output to take advantage of UP-TO-DATE
+                inputs.file task.source
+                outputs.dir tempDir
+
+                doFirst {
+                    def arguments = args
+                    arguments.addAll(['-g', '-c', '-D', tempDir])
+                    arguments.addAll(['-noserial', '-postcompiler', 'javac'])
+                    arguments.addAll(['-package', manifestPackage()])
+
+                    if (options.bootClasspath != null) {
+                        arguments.addAll(['-bootclasspath', options.bootClasspath])
+                    }
+                    // TODO: polyglot doesn't support -Xlint
+                    // arguments.addAll(options.compilerArgs)
+
+                    // if (options.encoding != null) {
+                    //     // TODO: polyglot doesn't support -encoding
+                    //     arguments.addAll(['-encoding', options.encoding])
+                    // }
+
+                    task.source.each {
+                        file -> arguments.add(file)
+                    }
+
+                    task.classpath.each {
+                        path -> arguments.addAll(['-classpath', path])
+                    }
+
+                    args arguments
+                }
+
+                // TODO: use maven to get maybe libs
+                classpath configurations.maybe
+
+                main = 'edu.buffalo.cse.blue.maybe.Main'
+
+                dependsOn task.dependsOn.collect()
+
+            }
+            task.dependsOn { newTaskName }
+            task.doFirst {
+                task.source = fileTree(dir: task.destinationDir.toString() + 'maybe')
+            }
+    }
 }

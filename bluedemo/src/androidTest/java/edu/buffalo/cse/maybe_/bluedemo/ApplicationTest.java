@@ -1,4 +1,4 @@
-package edu.buffalo.cse.maybe.bluedemo;
+package edu.buffalo.cse.maybe_.bluedemo;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
