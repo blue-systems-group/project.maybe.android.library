@@ -8,10 +8,24 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <receiver android:name="edu.buffalo.cse.maybe_.android.library.receivers.PullReceiver">
+        <receiver android:name="edu.buffalo.cse.maybe_.android.library.receivers.BootCompletedAndPullReceiver">
             <intent-filter android:priority="1">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="edu.buffalo.cse.maybe_.android.library.pull_intent" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="edu.buffalo.cse.maybe_.android.library.receivers.BatteryReceiver">
+            <intent-filter android:priority="1">
+                <action android:name="android.intent.action.BATTERY_CHANGED"/>
+                <action android:name="android.intent.action.BATTERY_LOW"/>
+                <action android:name="android.intent.action.BATTERY_OKAY"/>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="edu.buffalo.cse.maybe_.android.library.receivers.ConnectivityChangeReceiver">
+            <intent-filter android:priority="1">
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
         </receiver>
         <!--[START log_intentserver] -->

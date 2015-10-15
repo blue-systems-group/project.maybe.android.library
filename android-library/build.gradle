@@ -1,0 +1,126 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+description = 'Maybe Android Library'
+
+// This is the library version used when deploying the artifact
+version = '0.0.2'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion '22.0.1'
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
+
+def siteUrl = 'https://github.com/blue-systems-group/project.maybe.android.library'
+def gitUrl = 'https://github.com/blue-systems-group/project.maybe.android.library.git'
+group = 'edu.buffalo.cse.maybe'
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+
+                // Add your description here
+                name 'Maybe Android Library'
+                description 'Maybe Android Library'
+                url siteUrl
+
+                // Set your license
+                licenses {
+                    license {
+                        name 'The MIT License (MIT)'
+                        url 'https://opensource.org/licenses/MIT'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'xcv58'
+                        name 'Yihong'
+                        email 'ychen78@buffalo.edu'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+    publish = true
+    pkg {
+        repo = "maven"
+        name = "maybe-android-library"
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["MIT"]
+    }
+}
+
+repositories {
+    mavenLocal()
+}
+
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives androidSourcesJar
+    archives androidJavadocsJar
+}
+
+dependencies {
+    compile 'com.google.android.gms:play-services:7.8.0'
+
+    compile 'com.squareup.retrofit:retrofit:2.0.0-beta1'
+    compile 'com.squareup.retrofit:adapter-rxjava:2.0.0-beta1'
+    compile 'com.squareup.retrofit:converter-gson:2.0.0-beta1'
+
+    compile 'io.reactivex:rxandroid:1.0.1'
+    compile 'io.reactivex:rxjava:1.0.14'
+
+    testCompile 'junit:junit:4.12'
+}

@@ -135,6 +135,6 @@ public class MainActivityFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-//        maybeService.log(logging);
+        maybeService.log("123", logging);
     }
 }

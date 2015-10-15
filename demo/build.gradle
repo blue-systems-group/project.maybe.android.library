@@ -18,21 +18,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    productFlavors {
-    }
-    sourceSets {
-        main.java.srcDirs += 'src/main/java/edu.buffalo.cse.maybe.android.library.demo/MainActivity'
-    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
-    }
-}
-
-repositories {
-    flatDir {
-        dirs 'libs'
     }
 }
 
@@ -42,7 +31,7 @@ configurations {
 
 dependencies {
     //    compile(name: 'maybe', ext: 'aar')
-    compile project(':library')
+    compile project(':android-library')
     compile 'com.google.android.gms:play-services:7.8.0'
     testCompile 'junit:junit:4.12'
     maybe 'com.google.code.gson:gson:2.3.1'
@@ -77,6 +66,7 @@ afterEvaluate {
                 doFirst {
                     def arguments = args
                     arguments.addAll(['-g', '-c', '-D', tempDir])
+                    arguments.addAll(['-upload'])
                     arguments.addAll(['-noserial', '-postcompiler', 'javac'])
                     arguments.addAll(['-package', manifestPackage()])
 

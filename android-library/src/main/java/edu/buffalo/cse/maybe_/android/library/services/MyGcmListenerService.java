@@ -19,9 +19,9 @@ public class MyGcmListenerService extends GcmListenerService {
     public void onMessageReceived(String from, Bundle data) {
         Utils.debug("from: " + from + "; data: " + data.toString());
         this.sendNotification("Push from Maybe Backend");
-        Utils.debug("trigger init for MaybeService!");
+        Utils.debug("trigger syncWithBackend for MaybeService!");
         MaybeService maybeService = MaybeService.getInstance(getApplicationContext());
-        maybeService.init();
+        maybeService.syncWithBackend();
     }
 
     /**
