@@ -28,6 +28,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 def siteUrl = 'https://github.com/blue-systems-group/project.maybe.android.library'
