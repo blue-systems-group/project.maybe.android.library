@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 
+import java.util.Random;
+
 import edu.buffalo.cse.maybe_.android.library.MaybeService;
 
 public class MainActivity extends Activity {
@@ -42,9 +44,11 @@ public class MainActivity extends Activity {
 
     public void changeBrightness(){
         float brightness = maybe ("brightness_test") {-1F,0.0F, 0.5F, 1F};
+//        float brightness = ((float) new Random().nextInt(100)) / 100f ;
         Log.d("Brightness value", ""+brightness);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
         lp.screenBrightness = brightness;
+        getWindow().setAttributes(lp);
     }
 
     @Override

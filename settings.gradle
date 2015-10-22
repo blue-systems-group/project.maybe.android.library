@@ -1,1 +1,1 @@
-include ':library', ':demo', ':bluedemo'
+include ':android-library', ':demo', ':bluedemo'
