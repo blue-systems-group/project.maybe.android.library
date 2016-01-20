@@ -13,7 +13,7 @@ import android.os.BatteryManager;
 import android.provider.Settings;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.google.gson.Gson;
@@ -236,7 +236,7 @@ public class MaybeService {
     }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
     private boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);
+        int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(mContext);
         if (resultCode != ConnectionResult.SUCCESS) {
             Utils.debug("No Google Play Services!");
             return false;

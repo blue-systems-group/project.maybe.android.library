@@ -6,7 +6,7 @@ apply plugin: 'com.jfrog.bintray'
 description = 'Maybe Android Library'
 
 // This is the library version used when deploying the artifact
-version = '0.0.2'
+version = '0.0.3'
 
 android {
     compileSdkVersion 23
@@ -113,7 +113,8 @@ artifacts {
 }
 
 dependencies {
-    compile 'com.google.android.gms:play-services:7.8.0'
+    compile 'com.google.android.gms:play-services:8.4.0'
+    compile 'com.google.android.gms:play-services-gcm:8.4.0'
 
     compile 'com.squareup.retrofit:retrofit:2.0.0-beta1'
     compile 'com.squareup.retrofit:adapter-rxjava:2.0.0-beta1'
